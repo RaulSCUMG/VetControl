@@ -1,9 +1,5 @@
 import { NavLink } from "react-router-dom";
-<<<<<<< HEAD
-import { FaTachometerAlt, FaUsers, FaCalendarAlt, FaBoxes, FaFileInvoice, FaChartLine, FaPaw, FaUserMd } from "react-icons/fa";
-=======
 import { FaTachometerAlt, FaUsers, FaCalendarAlt, FaBoxes, FaFileInvoice, FaChartLine, FaPaw, FaUserMd, FaUserShield } from "react-icons/fa";
->>>>>>> 72d3924 (pantallas pendientes)
 
 export default function Sidebar() {
   return (
@@ -29,10 +25,6 @@ export default function Sidebar() {
         <NavLink className="nav-item" to="/facturacion">
           <FaFileInvoice /> Facturación
         </NavLink>
-<<<<<<< HEAD
-        <NavLink className="nav-item" to="/veterinario">
-          <FaUserMd /> Veterinario
-=======
         <NavLink className="nav-item" to="/empleados">
           <FaUserMd /> Empleados
         </NavLink>
@@ -41,7 +33,6 @@ export default function Sidebar() {
         </NavLink>
         <NavLink className="nav-item" to="/roles">
           <FaUserShield /> Roles
->>>>>>> 72d3924 (pantallas pendientes)
         </NavLink>
         <NavLink className="nav-item" to="/reportes">
           <FaChartLine /> Reportes

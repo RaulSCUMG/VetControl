@@ -8,14 +8,9 @@ import Citas from "./pages/Citas";
 import Inventario from "./pages/Inventario";
 import Facturacion from "./pages/Facturacion";
 import Login from "./pages/Login";
-<<<<<<< HEAD
-import Veterinario from "./pages/Veterinario";
-
-=======
 import Empleados from "./pages/Empleados";
 import Usuarios from "./pages/Usuarios";
 import Roles from "./pages/Roles";
->>>>>>> 72d3924 (pantallas pendientes)
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./index.css";
 
@@ -69,13 +64,9 @@ export default function App() {
         <Route path="/citas" element={<Citas />} />
         <Route path="/inventario" element={<Inventario />} />
         <Route path="/facturacion" element={<Facturacion />} />
-<<<<<<< HEAD
-        <Route path="/veterinario" element={<Veterinario />} />
-=======
         <Route path="/empleados" element={<Empleados />} />
         <Route path="/usuarios" element={<Usuarios />} />
         <Route path="/roles" element={<Roles />} />
->>>>>>> 72d3924 (pantallas pendientes)
         <Route
           path="/reportes"
           element={<div className="card" style={{ padding: 24 }}>Reportes (WIP)</div>}
