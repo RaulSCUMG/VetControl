@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import Empleados from "./pages/Empleados";
 import Usuarios from "./pages/Usuarios";
 import Roles from "./pages/Roles";
+import Reportes from "./pages/Reportes";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./index.css";
 
@@ -69,7 +70,7 @@ export default function App() {
         <Route path="/roles" element={<Roles />} />
         <Route
           path="/reportes"
-          element={<div className="card" style={{ padding: 24 }}>Reportes (WIP)</div>}
+          element={<Reportes />}
         />
       </Route>
 
