@@ -38,8 +38,8 @@ export default function Dashboard() {
 
       {/* acciones */}
       <section className="actions">
-        <button className="btn btn-primary">Nueva Cita</button>
-        <button className="btn btn-primary ghost">Registrar Paciente</button>
+  <button className="btn btn-primary">Nueva Cita</button>
+  <button className="btn btn-primary">Registrar Paciente</button>
       </section>
     </div>
   );

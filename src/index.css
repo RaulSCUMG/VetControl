@@ -1,3 +1,421 @@
+/* --- Correcciones específicas modo oscuro según capturas --- */
+body.dark-mode .pill,
+body.dark-mode .pill[aria-current="page"],
+body.dark-mode .pill:focus,
+body.dark-mode .pill:active {
+  background: #5c6cff !important;
+  color: #fff !important;
+  border: none !important;
+}
+body.dark-mode .pill:not([aria-current="page"]) {
+  background: #23232a !important;
+  color: #fff !important;
+  border: 1.5px solid #bdbdbd !important;
+}
+body.dark-mode .pill:not([aria-current="page"]):hover {
+  background: #35354a !important;
+  color: #fff !important;
+}
+body.dark-mode .section-title,
+body.dark-mode .form-title,
+body.dark-mode .field label,
+body.dark-mode .modal-form label,
+body.dark-mode .table thead tr:first-child th,
+body.dark-mode .table th,
+body.dark-mode .table td,
+body.dark-mode .filters-row th,
+body.dark-mode .bill-header .empresa,
+body.dark-mode .actions .link,
+body.dark-mode .actions .link.muted,
+body.dark-mode .login-brand,
+body.dark-mode .login-title,
+body.dark-mode .login-form label,
+body.dark-mode .resume h3,
+body.dark-mode .resume .r-line,
+body.dark-mode .resume .r-total,
+body.dark-mode .stat .value,
+body.dark-mode .stat h3,
+body.dark-mode .nav-item,
+body.dark-mode .nav-item.active,
+body.dark-mode .nav-item:hover {
+  color: #fff !important;
+}
+body.dark-mode .btn,
+body.dark-mode .btn-primary,
+body.dark-mode .btn.btn-primary,
+body.dark-mode .btn.mini {
+  background: #5c6cff !important;
+  color: #fff !important;
+  border: none !important;
+  transition: background 0.2s, color 0.2s;
+}
+body.dark-mode .btn:hover,
+body.dark-mode .btn-primary:hover,
+body.dark-mode .btn.btn-primary:hover,
+body.dark-mode .btn.mini:hover {
+  background: #4654f0 !important;
+  color: #fff !important;
+}
+/* Restaurar estilos originales de calendario */
+body.dark-mode .date-input,
+body.dark-mode input[type="date"],
+body.dark-mode input[type="datetime-local"] {
+  background: #23232a !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+
+body.dark-mode .date-input::-webkit-calendar-picker-indicator,
+body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator,
+body.dark-mode input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* Estilos para los botones de filtro de días en reportes */
+body.dark-mode .report-filter-btn,
+body.dark-mode .report-day-filter {
+  background: #5c6cff !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 999px !important;
+  padding: 0.5rem 1rem !important;
+  cursor: pointer !important;
+}
+
+body.dark-mode .report-filter-btn:hover,
+body.dark-mode .report-day-filter:hover {
+  background: #4654f0 !important;
+}
+
+body.dark-mode .report-filter-btn.active,
+body.dark-mode .report-day-filter.active {
+  background: #4654f0 !important;
+  font-weight: 600 !important;
+}
+/* --- Corrección exhaustiva de contraste modo oscuro --- */
+body.dark-mode {
+  --bg: #18181b;
+  --card: #23232a;
+  --txt: #fff;
+  --muted: #bdbdbd;
+}
+body.dark-mode, body.dark-mode .content, body.dark-mode .main {
+  background: var(--bg) !important;
+  color: var(--txt) !important;
+}
+body.dark-mode .side, body.dark-mode .sidebar, body.dark-mode .topbar, body.dark-mode .card, body.dark-mode .stat, body.dark-mode .login-card, body.dark-mode .table-card, body.dark-mode .modal, body.dark-mode .form-card {
+  background: var(--card) !important;
+  color: #fff !important;
+  border-color: #23232a !important;
+}
+body.dark-mode .brand,
+body.dark-mode .nav-item,
+body.dark-mode .nav-item.active,
+body.dark-mode .nav-item:hover,
+body.dark-mode .pill,
+body.dark-mode .stat .value,
+body.dark-mode .stat h3,
+body.dark-mode .section-title,
+body.dark-mode .form-title,
+body.dark-mode .field label,
+body.dark-mode .modal-form label,
+body.dark-mode .modal-form input,
+body.dark-mode .modal-form select,
+body.dark-mode .table thead tr:first-child th,
+body.dark-mode .table th,
+body.dark-mode .table td,
+body.dark-mode .filters-row th,
+body.dark-mode .bill-header .empresa,
+body.dark-mode .actions .link,
+body.dark-mode .actions .link.muted,
+body.dark-mode .login-brand,
+body.dark-mode .login-title,
+body.dark-mode .login-form label,
+body.dark-mode .resume h3,
+body.dark-mode .resume .r-line,
+body.dark-mode .resume .r-total {
+  color: #fff !important;
+}
+body.dark-mode .field input,
+body.dark-mode .modal-form input,
+body.dark-mode .modal-form select,
+body.dark-mode .search,
+body.dark-mode .date-input,
+body.dark-mode .table input.mini {
+  background: #23232a !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+body.dark-mode .field input::placeholder,
+body.dark-mode .modal-form input::placeholder,
+body.dark-mode .search::placeholder,
+body.dark-mode .date-input::placeholder {
+  color: #bdbdbd !important;
+}
+body.dark-mode .form-footer {
+  background: var(--primary) !important;
+  color: #18181b !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,.08) inset;
+}
+body.dark-mode .form-footer .btn,
+body.dark-mode .form-footer .btn.btn-primary {
+  background: #fff !important;
+  color: #18181b !important;
+}
+body.dark-mode .appt {
+  background: #eef0ff !important;
+  color: #18181b !important;
+}
+body.dark-mode .appt-time,
+body.dark-mode .appt-patient,
+body.dark-mode .appt-meta {
+  color: #18181b !important;
+}
+body.dark-mode .btn,
+body.dark-mode .btn-primary,
+body.dark-mode .btn.btn-primary,
+body.dark-mode .btn.mini,
+body.dark-mode .btn.ghost,
+body.dark-mode .btn.outline {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border: none !important;
+}
+body.dark-mode .btn.ghost {
+  background: #23232a !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+body.dark-mode .btn.outline {
+  background: transparent !important;
+  color: var(--primary) !important;
+  border: 2px solid var(--primary) !important;
+}
+body.dark-mode .btn.mini {
+  background: #5c6cff !important;
+  color: #fff !important;
+}
+body.dark-mode .btn.mini:hover {
+  background: #4654f0 !important;
+}
+body.dark-mode .table thead tr:first-child th,
+body.dark-mode .table th,
+body.dark-mode .table td {
+  background: #23232a !important;
+  color: #fff !important;
+  border-color: #444 !important;
+}
+body.dark-mode .table tbody tr:hover {
+  background: #18181b !important;
+}
+body.dark-mode .modal-form input,
+body.dark-mode .modal-form select {
+  background: #23232a !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+body.dark-mode .modal-form input:focus,
+body.dark-mode .modal-form select:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(92,108,255,.15) !important;
+}
+body.dark-mode .modal-actions .btn.ghost {
+  background: #23232a !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+body.dark-mode .modal-actions .btn.btn-primary {
+  background: var(--primary) !important;
+  color: #fff !important;
+}
+body.dark-mode .muted,
+body.dark-mode .x {
+  color: #fff !important;
+}
+/* --- Mejoras de contraste modo oscuro global --- */
+body.dark-mode .section-title,
+body.dark-mode .form-title,
+body.dark-mode .field label,
+body.dark-mode .brand,
+body.dark-mode .nav-item,
+body.dark-mode .pill,
+body.dark-mode .stat .value,
+body.dark-mode .stat h3,
+body.dark-mode .topbar,
+body.dark-mode .actions .link,
+body.dark-mode .modal-form label,
+body.dark-mode .modal-form input,
+body.dark-mode .modal-form select,
+body.dark-mode .table thead tr:first-child th,
+body.dark-mode .table th,
+body.dark-mode .table td,
+body.dark-mode .filters-row th,
+body.dark-mode .bill-header .empresa {
+  color: #fff !important;
+}
+body.dark-mode .field input,
+body.dark-mode .modal-form input,
+body.dark-mode .modal-form select,
+body.dark-mode .search,
+body.dark-mode .date-input {
+  background: #23232a !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+body.dark-mode .field input::placeholder,
+body.dark-mode .modal-form input::placeholder,
+body.dark-mode .search::placeholder,
+body.dark-mode .date-input::placeholder {
+  color: #bdbdbd !important;
+}
+body.dark-mode .form-footer {
+  background: var(--primary) !important;
+  color: #18181b !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,.08) inset;
+}
+body.dark-mode .form-footer .btn,
+body.dark-mode .form-footer .btn.btn-primary {
+  background: #fff !important;
+  color: #18181b !important;
+}
+body.dark-mode .appt {
+  background: #eef0ff !important;
+  color: #18181b !important;
+}
+body.dark-mode .appt-time,
+body.dark-mode .appt-patient,
+body.dark-mode .appt-meta {
+  color: #18181b !important;
+}
+/* Modo oscuro global */
+body.dark-mode {
+  --bg: #18181b;
+  --card: #23232a;
+  --txt: #fff;
+  --muted: #bdbdbd;
+}
+body.dark-mode, body.dark-mode .content, body.dark-mode .main {
+  background: var(--bg) !important;
+  color: var(--txt) !important;
+}
+body.dark-mode .side, body.dark-mode .sidebar, body.dark-mode .topbar, body.dark-mode .card, body.dark-mode .stat, body.dark-mode .login-card {
+  background: var(--card) !important;
+  color: var(--txt) !important;
+  border-color: #23232a !important;
+}
+body.dark-mode .nav-item, body.dark-mode .brand, body.dark-mode .login-brand, body.dark-mode .login-title, body.dark-mode .login-form label, body.dark-mode .stat .value, body.dark-mode .stat h3, body.dark-mode .alerts, body.dark-mode .btn, body.dark-mode .btn-primary {
+  color: #fff !important;
+}
+body.dark-mode .nav-item:hover, body.dark-mode .nav-item.active {
+  background: #23232a !important;
+  color: #fff !important;
+}
+body.dark-mode .search, body.dark-mode .icon-btn, body.dark-mode .btn, body.dark-mode .btn-primary {
+  background: #23232a !important;
+  color: #fff !important;
+  border-color: #444 !important;
+}
+body.dark-mode .search:focus {
+  background: #18181b !important;
+}
+body.dark-mode .btn-primary, body.dark-mode .btn.btn-primary {
+  background: var(--primary) !important;
+  color: #fff !important;
+}
+body.dark-mode .btn-primary:hover, body.dark-mode .btn.btn-primary:hover {
+  background: var(--primary-700) !important;
+}
+body.dark-mode .login-error {
+  background: #3a1a1a !important;
+  color: #ffbdbd !important;
+  border-color: #a52828 !important;
+}
+/* Settings icon and menu */
+.login-settings {
+  position: absolute;
+  top: 24px;
+  right: 32px;
+  z-index: 10;
+}
+.settings-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #888;
+  transition: color 0.2s;
+}
+body.dark-mode .settings-menu {
+  background: #fff !important;
+  color: #18181b !important;
+  border: 1px solid #eee !important;
+}
+body.dark-mode .settings-menu div {
+  color: #18181b !important;
+}
+body.dark-mode .settings-menu div:hover {
+  background: #f0f2ff !important;
+  color: var(--primary) !important;
+}
+.settings-btn:hover {
+  color: var(--primary);
+}
+.settings-menu {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.10);
+  min-width: 120px;
+  font-size: 1rem;
+  overflow: hidden;
+}
+.settings-menu div {
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.settings-menu div:hover {
+  background: #f0f2ff;
+}
+
+/* Dark mode for login */
+/* Do not override the background image in dark mode - keep the photo unchanged.
+   Only adjust background-color if needed, and remove the page-wide overlay so the
+   image doesn't get darkened when toggling dark mode. */
+body.dark-mode .login-wrap {
+  background-color: var(--bg);
+}
+body.dark-mode .login-wrap::before {
+  background: rgba(0,0,0,0); /* transparent overlay in dark mode */
+}
+body.dark-mode .login-card {
+  /* Keep login-card transparent in dark mode so the photographic background
+     remains the visible layer and no larger back-frame appears. */
+  background: transparent !important;
+  border-color: transparent !important;
+  color: inherit !important;
+}
+body.dark-mode .login-brand,
+body.dark-mode .login-title,
+body.dark-mode .login-form label {
+  color: #fff;
+}
+body.dark-mode .login-form input {
+  background: #18181b;
+  color: #fff;
+  border: 1px solid #444;
+}
+body.dark-mode .login-form input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(92,108,255,.15);
+}
+body.dark-mode .btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
 :root{
   --bg: #f6f7fb;
   --card: #eef0ff;
@@ -144,11 +562,13 @@ body{
 /* Grid del formulario */
 .form-body{ display:flex; flex-direction:column; gap:.25rem; }
 .form-grid{
-  display:grid; gap:1rem; grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  display: grid;
+  align-items: center; /* vertical center */
+  justify-items: start; /* place content to the left so the dog image is visible on the right */
+  position: relative;
+  padding: 1rem;
 }
-.field{ display:flex; flex-direction:column; gap:.35rem; }
-.field.col-2{ grid-column: span 2; }
-.field label{ font-size:.92rem; color:#4a4f58; font-weight:700; }
 
 /* Inputs bonitos + full width */
 .field input{
@@ -168,6 +588,52 @@ body{
 
 /* Footer de acciones fijo visualmente */
 .form-footer{
+body.login-bg {
+  background-image: url('/LOGIN MORADO.jpg');
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* When the login background is active, make the main app shells transparent
+   so the photo fills the entire viewport (including side/top panels). */
+body.login-bg .app-shell,
+body.login-bg .side,
+body.login-bg .sidebar,
+body.login-bg .topbar,
+body.login-bg .content,
+body.login-bg .card,
+body.login-bg .table-card,
+body.login-bg .modal,
+body.login-bg .modal-backdrop {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure the login form remains the same size in dark mode and the
+   photographic background is not replaced by dark background rules. */
+body.login-bg .login-card { background: transparent !important; }
+body.login-bg .login-card .form-container,
+body.dark-mode.login-bg .login-card .form-container {
+  width: 340px !important;
+  min-height: 320px !important;
+  background-color: rgba(17,24,39,0.95) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,.24) !important;
+}
+
+/* When dark-mode and login-bg are both present, keep the photographic
+   background visible (override broader dark-mode body rules). */
+body.dark-mode.login-bg,
+body.login-bg.dark-mode {
+  background-image: url('/LOGIN MORADO.jpg') !important;
+  background-position: center center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+  background-color: transparent !important;
+}
   position: sticky; bottom: -1rem;
   display:flex; gap:.75rem; justify-content:space-between; align-items:center;
   background:#e9ebff; padding:.8rem; border-radius:12px; margin-top:1rem;
@@ -220,6 +686,19 @@ body{
   padding:.7rem .8rem; font-weight:800; background:#f8f8ff; border-bottom:1px solid #eee;
 }
 .day-body{ padding:.6rem; display:flex; flex-direction:column; gap:.6rem; min-height: 160px; }
+
+/* Modo oscuro para los días de la semana */
+body.dark-mode .day-col {
+  background: #23232a;
+  border: 1px solid #5c6cff;
+}
+
+body.dark-mode .day-title {
+  background: #5c6cff;
+  color: #fff;
+  border-bottom: none;
+  font-weight: 600;
+}
 
 .appt{
   background:#eef0ff; border-radius:10px; padding:.55rem .6rem;
@@ -323,6 +802,17 @@ body{
 .card{ background:#fff; border:1px solid #eee; border-radius:16px; padding:1rem; box-shadow:0 6px 18px rgba(0,0,0,.06); }
 .grid-2{ display:grid; gap:.75rem; grid-template-columns:1fr 1fr 1fr; }
 .grid-2 label{ display:flex; flex-direction:column; gap:.35rem; font-weight:700; color:#4a4f58; }
+
+/* Asegurando que todos los tipos de labels sean blancos en modo oscuro */
+body.dark-mode .grid-2 label,
+body.dark-mode .form-group label,
+body.dark-mode .input-group label,
+body.dark-mode .control-label,
+body.dark-mode .field-label,
+body.dark-mode .form-label {
+  color: #fff !important;
+}
+
 label input{
   height:40px; border-radius:10px; border:1px solid #d9dbe8; padding:0 .6rem; outline:none; background:white;
 }
@@ -370,16 +860,99 @@ label input:focus{ border-color:#b8bdfa; box-shadow:0 0 0 3px rgba(92,108,255,.1
 /* ===== Login ===== */
 .login-wrap{
   min-height: 100vh;
-  display:grid; place-items:center;
-  background: linear-gradient(180deg, #f6f7fb 0%, #eef0ff 100%);
+  display: grid;
+  align-items: center; /* vertical center */
+  justify-items: start; /* place content to the left so the dog image is visible on the right */
+  /* usar la imagen que pegaste en public con el nombre exacto 'LOGIN MORADO.jpg' */
+  /* Left-side soft color band so the blank area matches the image tones and the
+    animals remain visually steady on the right. The gradient is above the image
+    layer so the left side shows a soft blur-like color matching the photo. */
+  /* Use the photographic image as the only background and make it cover the
+    entire viewport so there are no blank bands. */
+  /* make the login wrapper cover the full viewport so the image fills all the
+     green-lined areas in your reference screenshots */
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  background-image: url('/LOGIN MORADO.jpg');
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   padding: 1rem;
+}
+
+/* overlay to keep card readable over image */
+.login-wrap::before{
+  /* keep the overlay transparent so the photo remains unchanged; if you need
+     additional contrast for the form, the .form-container provides its own
+     background color */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0); /* transparent */
+  pointer-events: none;
 }
 .login-card{
   width: min(420px, 92vw);
-  background:#fff; border:1px solid #eee; border-radius:20px;
-  box-shadow: 0 20px 60px rgba(0,0,0,.08);
-  padding: 1.25rem 1.25rem 1rem;
+  /* remove the back frame so only the inner (front) form remains visible */
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 20px;
+  padding: 0.25rem 0.25rem 0;
+  margin-left: clamp(36px, 6vw, 100px); /* shift card to the left side */
+  z-index: 2; /* bring the card above the fixed background */
 }
+
+/* Scoped form styles for the redesigned login */
+.login-card .form-container {
+  width: 340px;
+  border-radius: 0.75rem;
+  /* Keep the form container visually separate but fixed so dark mode won't invert it */
+  background-color: rgba(17, 24, 39, 0.95);
+  padding: 2rem;
+  color: rgba(243, 244, 246, 1);
+  box-shadow: 0 12px 40px rgba(0,0,0,.24);
+  min-height: 320px; /* keep height consistent between modes */
+  z-index: 3;
+}
+
+/* Prevent dark-mode rules elsewhere from changing the login form size */
+body.dark-mode .login-card .form-container {
+  width: 340px !important;
+  min-height: 320px !important;
+  background-color: rgba(17, 24, 39, 0.95) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,.24) !important;
+}
+.login-card .form-container .title {
+  text-align: center;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+}
+.login-card .form-container .form { margin-top: 1.5rem; }
+.login-card .form-container .input-group { margin-top: 0.25rem; font-size: 0.875rem; line-height: 1.25rem; }
+.login-card .form-container .input-group label { display: block; color: rgba(156, 163, 175, 1); margin-bottom: 4px; }
+.login-card .form-container .input-group input { width: 100%; height: 44px; border-radius: 0.5rem; border: 1px solid #dbe8ff; outline: 0; background-color: #eef4ff; padding: 0 1rem; color: #111827; font-size: 0.95rem; }
+.login-card .form-container .input-group input:focus { border-color: rgba(167, 139, 250, 1); box-shadow: 0 6px 18px rgba(92,108,255,.12); }
+/* placeholder color for the inputs */
+.login-card .form-container .input-group input::placeholder { color: #94a3b8; }
+
+.login-card .form-container .sign { display: block; width: 100%; background-color: rgba(167, 139, 250, 1); padding: 0.75rem; text-align: center; color: rgba(17, 24, 39, 1); border: none; border-radius: 0.375rem; font-weight: 600; margin-top: 18px; }
+.login-card .form-container .forgot { display: flex; justify-content: flex-end; font-size: 0.75rem; line-height: 1rem; color: rgba(156, 163, 175,1); margin: 8px 0 14px 0; }
+.login-card .form-container .forgot a,.login-card .form-container .signup a { color: rgba(243, 244, 246, 1); text-decoration: none; font-size: 14px; }
+.login-card .form-container .forgot a:hover, .login-card .form-container .signup a:hover { text-decoration: underline rgba(167, 139, 250, 1); }
+.login-card .form-container .sign { display: block; width: 100%; background-color: rgba(167, 139, 250, 1); padding: 0.75rem; text-align: center; color: rgba(17, 24, 39, 1); border: none; border-radius: 0.375rem; font-weight: 600; }
+.login-card .form-container .social-message { display: flex; align-items: center; padding-top: 1rem; }
+.login-card .form-container .line { height: 1px; flex: 1 1 0%; background-color: rgba(55, 65, 81, 1); }
+.login-card .form-container .social-message .message { padding-left: 0.75rem; padding-right: 0.75rem; font-size: 0.875rem; line-height: 1.25rem; color: rgba(156, 163, 175, 1); }
+.login-card .form-container .social-icons { display: flex; justify-content: center; }
+.login-card .form-container .social-icons .icon { border-radius: 0.125rem; padding: 0.75rem; border: none; background-color: transparent; margin-left: 8px; }
+.login-card .form-container .social-icons .icon svg { height: 1.25rem; width: 1.25rem; fill: #fff; }
+.login-card .form-container .signup { text-align: center; font-size: 0.75rem; line-height: 1rem; color: rgba(156, 163, 175, 1); }
 .login-brand{
   font-weight:900; letter-spacing:.3px; color:#1a1a1a; text-align: center; font-size: xx-large;
 }
