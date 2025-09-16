@@ -146,24 +146,24 @@ export default function Patients() {
             <h4 className="section-title">Datos Generales</h4>
             <div className="form-grid">
               <div className="field">
-                <label>Nombre</label>
-                <input name="nombre" placeholder="Nombre del paciente" value={form.nombre} onChange={onChange}/>
+                <label htmlFor="nombre">Nombre</label>
+                <input id="nombre" name="nombre" placeholder="Nombre del paciente" value={form.nombre} onChange={onChange}/>
               </div>
               <div className="field">
-                <label>Especie</label>
-                <input name="especie" placeholder="Especie" value={form.especie} onChange={onChange}/>
+                <label htmlFor="especie">Especie</label>
+                <input id="especie" name="especie" placeholder="Especie" value={form.especie} onChange={onChange}/>
               </div>
               <div className="field">
-                <label>Raza</label>
-                <input name="raza" placeholder="Raza" value={form.raza} onChange={onChange}/>
+                <label htmlFor="raza">Raza</label>
+                <input id="raza" name="raza" placeholder="Raza" value={form.raza} onChange={onChange}/>
               </div>
               <div className="field">
-                <label>Sexo</label>
-                <input name="sexo" placeholder="Sexo" value={form.sexo} onChange={onChange}/>
+                <label htmlFor="sexo">Sexo</label>
+                <input id="sexo" name="sexo" placeholder="Sexo" value={form.sexo} onChange={onChange}/>
               </div>
-              <div className="field col-2">//visualizacion de dos columnas 
-                <label>Fecha de Nacimiento</label>
-                <input name="nacimiento" type="date" placeholder="YYYY-MM-DD" value={form.nacimiento} onChange={onChange}/>
+              <div className="field col-2">
+                <label htmlFor="nacimiento">Fecha de Nacimiento</label>
+                <input id="nacimiento" name="nacimiento" type="date" placeholder="YYYY-MM-DD" value={form.nacimiento} onChange={onChange}/>
               </div>
             </div>      
 
@@ -171,16 +171,16 @@ export default function Patients() {
             <h4 className="section-title">Datos Clínicos</h4>
             <div className="form-grid">
               <div className="field">
-                <label>Vacunas</label>
-                <input name="vacunas" placeholder="Vacunas" value={form.vacunas} onChange={onChange}/>
+                <label htmlFor="vacunas">Vacunas</label>
+                <input id="vacunas" name="vacunas" placeholder="Vacunas" value={form.vacunas} onChange={onChange}/>
               </div>
               <div className="field">
-                <label>Alergias</label>
-                <input name="alergias" placeholder="Alergias" value={form.alergias} onChange={onChange}/>
+                <label htmlFor="alergias">Alergias</label>
+                <input id="alergias" name="alergias" placeholder="Alergias" value={form.alergias} onChange={onChange}/>
               </div>
               <div className="field col-2">
-                <label>Tratamientos Actuales</label>
-                <input name="tratamientos" placeholder="Tratamientos Actuales" value={form.tratamientos} onChange={onChange}/>
+                <label htmlFor="tratamientos">Tratamientos Actuales</label>
+                <input id="tratamientos" name="tratamientos" placeholder="Tratamientos Actuales" value={form.tratamientos} onChange={onChange}/>
               </div>
             </div>
 
@@ -188,16 +188,16 @@ export default function Patients() {
             <h4 className="section-title">Responsable</h4>
             <div className="form-grid">
               <div className="field">
-                <label>Nombre</label>
-                <input name="responsable" placeholder="Nombre del responsable" value={form.responsable} onChange={onChange}/>
+                <label htmlFor="responsable">Nombre</label>
+                <input id="responsable" name="responsable" placeholder="Nombre del responsable" value={form.responsable} onChange={onChange}/>
               </div>
               <div className="field">
-                <label>Teléfono</label>
-                <input name="telefono" placeholder="Teléfono" value={form.telefono} onChange={onChange}/>
+                <label htmlFor="telefono">Teléfono</label>
+                <input id="telefono" name="telefono" placeholder="Teléfono" value={form.telefono} onChange={onChange}/>
               </div>
               <div className="field col-2">
-                <label>Correo</label>
-                <input name="correo" type="email" placeholder="Correo electrónico" value={form.correo} onChange={onChange}/>
+                <label htmlFor="correo">Correo</label>
+                <input id="correo" name="correo" type="email" placeholder="Correo electrónico" value={form.correo} onChange={onChange}/>
               </div>
             </div>
 
