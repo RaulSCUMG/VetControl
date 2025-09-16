@@ -161,7 +161,7 @@ export default function Patients() {
                 <label>Sexo</label>
                 <input name="sexo" placeholder="Sexo" value={form.sexo} onChange={onChange}/>
               </div>
-              <div className="field col-2">
+              <div className="field col-2">//visualizacion de dos columnas 
                 <label>Fecha de Nacimiento</label>
                 <input name="nacimiento" type="date" placeholder="YYYY-MM-DD" value={form.nacimiento} onChange={onChange}/>
               </div>
