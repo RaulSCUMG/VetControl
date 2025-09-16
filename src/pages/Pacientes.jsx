@@ -165,7 +165,7 @@ export default function Patients() {
                 <label>Fecha de Nacimiento</label>
                 <input name="nacimiento" type="date" placeholder="YYYY-MM-DD" value={form.nacimiento} onChange={onChange}/>
               </div>
-            </div>
+            </div>      
 
             {/* Sección: Datos Clínicos */}
             <h4 className="section-title">Datos Clínicos</h4>
