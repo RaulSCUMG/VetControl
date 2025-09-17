@@ -23,6 +23,9 @@ const empleadosRoutes = require("./src/routes/empleadosRoutes");
 const facturaEncabezado = require("./src/routes/facturaEncabezadoRoutes");
 const usuarios = require("./src/routes/usuarioRoutes");
 const facturaDetalle = require("./src/routes/facturaRoutes");
+const rolesPantallas = require("./src/routes/rolesPantallasRoutes");
+const productos = require("./src/routes/productosRoutes");
+const movimientos = require("./src/routes/movimientosInventarioRoutes");
 
 app.use("/api/categorias", categoriasRoutes);
 app.use("/api/especialidades", especialidadesRoutes);
@@ -35,5 +38,8 @@ app.use("/api/empleados", empleadosRoutes);
 app.use("/api/facturaEncabezado", facturaEncabezado);
 app.use("/api/usuarios", usuarios);
 app.use("/api/facturaDetalle", facturaDetalle);
+app.use("/api/rolesPantallas", rolesPantallas);
+app.use("/api/productos", productos);
+app.use("/api/movimientos", movimientos);
 
 module.exports = app;
