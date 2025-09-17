@@ -10,6 +10,7 @@ lerna-debug.log*
 # Dependencias
 Backend/node_modules/
 Front/node_modules/
+node_modules
 
 # Entorno
 # Backend/.env

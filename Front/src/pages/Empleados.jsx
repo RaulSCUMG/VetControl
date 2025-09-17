@@ -19,8 +19,8 @@ export default function Empleados() {
     apellidoCasada: "",
     dpi: "",
     telefono: "",
-    tipo_empleado_id: NULL,   // ← ID (requerido por API)
-    especialidad_id: NULL,    // ← opcional
+    tipo_empleado_id: null,   // ← ID (requerido por API)
+    especialidad_id: null,    // ← opcional
     activo: true,
   });
 
@@ -84,8 +84,8 @@ export default function Empleados() {
     apellidoCasada: "",
     dpi: "",
     telefono: "",
-    tipo_empleado_id: "",
-    especialidad_id: "",
+    tipo_empleado_id: null,
+    especialidad_id: null,
     activo: true,
   });
 
@@ -103,8 +103,8 @@ export default function Empleados() {
       apellido_casada: form.apellidoCasada || null,
       dpi: form.dpi,
       telefono: form.telefono || null,
-      tipo_empleado_id: Number(form.tipo_empleado_id),                  // ← requerido
-      especialidad_id: form.especialidad_id ? Number(form.especialidad_id) : null, // ← opcional
+      tipo_empleado_id: Number(form.tipo_empleado_id),
+      especialidad_id: form.especialidad_id ? Number(form.especialidad_id) : null,
       activo: form.activo ? 1 : 0,
     };
     console.log("Payload a enviar:", payload);
@@ -139,8 +139,8 @@ const startEdit = (e) => {
     apellidoCasada: e.apellido_casada || "",
     dpi: e.dpi || "",
     telefono: e.telefono || "",
-    tipo_empleado_id: tipo ? tipo.id : NULL,
-    especialidad_id: espec ? espec.id : NULL,
+    tipo_empleado_id: tipo ? Number(tipo.id) : null,
+    especialidad_id: espec ? Number(espec.id) : null,
     activo: !!e.activo,
   });
 };

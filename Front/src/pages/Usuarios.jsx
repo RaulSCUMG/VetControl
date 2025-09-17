@@ -1,208 +1,159 @@
 import { useEffect, useMemo, useState } from "react";
+import { api } from "../lib/api";
 
-/* ===== Claves de storage ===== */
-const LS_EMPLEADOS = "vc_empleados";
-const LS_USUARIOS  = "vc_usuarios";
-
-/* Catálogo de roles (ajústalo a tu gusto) */
-const ROLES = [
-  "Administrador",
-  "Veterinario",
-  "Facturación",
-  "Bodega",
-  "Recepción",
-  "Reportes",
-];
-
-/* ===== Hook: Empleados desde localStorage ===== */
-function useEmpleados() {
-  const [empleados, setEmpleados] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(LS_EMPLEADOS) || "[]"); }
-    catch { return []; }
-  });
-  // Si en otra pestaña cambian empleados
-  useEffect(() => {
-    const onStorage = (e) => {
-      if (e.key === LS_EMPLEADOS) {
-        try { setEmpleados(JSON.parse(e.newValue || "[]")); } catch {}
-      }
-    };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
-  return empleados;
-}
-
-/* ===== Hook: Usuarios CRUD en localStorage ===== */
-function useUsuarios() {
-  const [users, setUsers] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(LS_USUARIOS) || "[]"); }
-    catch { return []; }
-  });
-  useEffect(() => {
-    localStorage.setItem(LS_USUARIOS, JSON.stringify(users));
-  }, [users]);
-  return { users, setUsers };
-}
-
-/* ===== Modal: buscador de empleados ===== */
-function PickerEmpleado({ open, initialQuery = "", onClose, onPick }) {
-  const empleados = useEmpleados();
-  const [q, setQ] = useState(initialQuery);
-  const [selId, setSelId] = useState(null);
-
-  const lista = useMemo(() => {
-    const t = q.trim().toLowerCase();
-    if (!t) return empleados;
-    return empleados.filter((e) =>
-      [
-        e.nombre, e.nombre2, e.apellido, e.apellido2, e.apellidoCasada,
-        e.dpi, e.telefono, e.tipoEmpleado,
-      ]
-        .filter(Boolean)
-        .map(String)
-        .some((v) => v.toLowerCase().includes(t))
-    );
-  }, [q, empleados]);
-
-  const confirmar = () => {
-    if (!selId) return onClose();
-    const emp = empleados.find((e) => e.id === selId);
-    if (emp) onPick(emp);
-    onClose();
-  };
-
-  if (!open) return null;
-  return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e)=>e.stopPropagation()}>
-        <h3>Buscar empleado</h3>
-
-        <div className="picker-search">
-          <input
-            autoFocus
-            placeholder="Nombre, DPI, teléfono, tipo…"
-            value={q}
-            onChange={(e)=>setQ(e.target.value)}
-            onKeyDown={(e)=>e.key==="Enter" && e.preventDefault()}
-          />
-        </div>
-
-        <div className="picker-list" style={{maxHeight:"50vh"}}>
-          {lista.map((e)=>(
-            <label key={e.id} className="picker-row" style={{gridTemplateColumns:"auto 1fr auto"}}>
-              <input
-                type="radio"
-                name="empPick"
-                checked={selId===e.id}
-                onChange={()=>setSelId(e.id)}
-              />
-              <div className="pk-name">
-                <b>{e.nombre} {e.nombre2}</b> — {e.apellido} {e.apellido2} {e.apellidoCasada ? `(${e.apellidoCasada})` : ""}
-                <div className="muted" style={{fontSize:".85rem"}}>
-                  DPI: {e.dpi || "—"} · Tel: {e.telefono || "—"} · {e.tipoEmpleado}
-                </div>
-              </div>
-              <div className="pk-price">{e.activo ? "Activo" : "Inactivo"}</div>
-            </label>
-          ))}
-          {lista.length===0 && <div className="muted" style={{padding:".5rem 0"}}>Sin coincidencias</div>}
-        </div>
-
-        <div className="modal-actions">
-          <button className="btn ghost" onClick={onClose}>Cancelar</button>
-          <button className="btn btn-primary" onClick={confirmar}>Seleccionar</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ===== Página: Usuarios ===== */
 export default function Usuarios() {
-  const empleados = useEmpleados();
-  const { users, setUsers } = useUsuarios();
+  const [cargando, setCargando] = useState(false);
+
+  // catálogos
+  const [empleados, setEmpleados] = useState([]);
+  const [roles, setRoles] = useState([]);
+
+  // usuarios
+  const [users, setUsers] = useState([]);
 
   // form crear
   const [form, setForm] = useState({
-    empleadoId: null,
-    empleadoNombre: "",
-    username: "",
-    password: "",
-    role: "Recepción",
+    empleado_id: "",
+    usuario: "",
+    clave: "",
+    rol_id: "",
     activo: true,
   });
 
-  // picker empleado
-  const [openPicker, setOpenPicker] = useState(false);
-  const [empQuery, setEmpQuery] = useState("");
-
-  const setEmpleado = (emp) => {
-    const nombreCompleto = `${emp.nombre || ""} ${emp.nombre2 || ""} ${emp.apellido || ""} ${emp.apellido2 || ""}`
-      .replace(/\s+/g,' ')
-      .trim();
-    setForm((f)=>({ ...f, empleadoId: emp.id, empleadoNombre: nombreCompleto }));
-  };
-
-  const crear = (e) => {
-    e.preventDefault();
-    if (!form.empleadoId) return alert("Selecciona un empleado.");
-    if (!form.username || !form.password) return alert("Usuario y clave son requeridos.");
-    if (users.some(u => u.username.toLowerCase() === form.username.trim().toLowerCase())) {
-      return alert("El usuario ya existe.");
-    }
-    const nuevo = {
-      id: crypto.randomUUID(),
-      empleadoId: form.empleadoId,
-      empleadoNombre: form.empleadoNombre,
-      username: form.username.trim(),
-      // DEMO: en producción nunca guardes plano
-      password: form.password,
-      role: form.role,
-      activo: form.activo,
-      ts: Date.now(),
-    };
-    setUsers(prev => [nuevo, ...prev]);
-    setForm({
-      empleadoId: null, empleadoNombre: "", username: "", password: "",
-      role: "Recepción", activo: true,
-    });
-    setEmpQuery("");
-  };
-
   // edición inline
   const [editId, setEditId] = useState(null);
-  const [draft, setDraft] = useState(null);
-  const startEdit = (u) => { setEditId(u.id); setDraft({ role: u.role, activo: u.activo }); };
-  const cancelEdit = () => { setEditId(null); setDraft(null); };
-  const saveEdit = () => {
-    setUsers(prev => prev.map(u => u.id === editId ? { ...u, ...draft } : u));
-    cancelEdit();
-  };
+  const [draft, setDraft] = useState({ rol_id: "", activo: true });
 
-  // modal cambiar contraseña
+  // cambiar contraseña
   const [pwOpen, setPwOpen] = useState(false);
   const [pwUser, setPwUser] = useState(null);
   const [pw, setPw] = useState({ a: "", b: "" });
   const [pwErr, setPwErr] = useState("");
-  const openPw = (u) => { setPwUser(u); setPw({a:"",b:""}); setPwErr(""); setPwOpen(true); };
-  const savePw = (e) => {
+
+  // búsqueda
+  const [q, setQ] = useState("");
+
+  // ===== CARGA INICIAL =====
+  const cargarTodo = async () => {
+    setCargando(true);
+    try {
+      const [emps, rols, usrs] = await Promise.all([
+        api.get("/api/empleados/listarEmpleados"),
+        api.get("/api/roles/listarRoles"),
+        api.get("/api/usuarios/listarUsuarios"),
+      ]);
+      setEmpleados(emps.data || []);
+      setRoles(rols.data || []);
+      setUsers(usrs.data || []);
+    } catch (e) {
+      console.error(e);
+      alert("Error cargando catálogos/usuarios");
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  useEffect(() => { cargarTodo(); }, []);
+
+  // ===== CREAR =====
+  const crear = async (e) => {
+    e.preventDefault();
+    if (!form.empleado_id || !form.usuario || !form.clave || !form.rol_id) {
+      return alert("Empleado, usuario, clave y rol son obligatorios.");
+    }
+    const payload = {
+      empleado_id: Number(form.empleado_id),
+      usuario: form.usuario.trim(),
+      clave_hash: form.clave,
+      rol_id: Number(form.rol_id),
+      activo: form.activo ? 1 : 0,
+    };
+    setCargando(true);
+    try {
+      await api.post("/api/usuarios/crearUsuarios", payload);
+      setForm({ empleado_id: "", usuario: "", clave: "", rol_id: "", activo: true });
+      await cargarTodo();
+    } catch (err) {
+      console.error(err);
+      alert(err?.response?.data?.error || "Error al crear usuario");
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  // ===== EDITAR (rol / activo) =====
+  const startEdit = (u) => {
+    setEditId(u.id);
+    setDraft({ rol_id: u.rol_id, activo: !!u.activo });
+  };
+  const cancelEdit = () => { setEditId(null); setDraft({ rol_id: "", activo: true }); };
+
+  const saveEdit = async () => {
+    const u = users.find(x => x.id === editId);
+    if (!u) return cancelEdit();
+
+    // necesitamos enviar TODOS los campos que el backend espera
+    const payload = {
+      empleado_id: u.empleado_id,
+      usuario: u.usuario,
+      clave_hash: u.clave_hash,
+      rol_id: Number(draft.rol_id),
+      activo: draft.activo ? 1 : 0,
+    };
+    setCargando(true);
+    try {
+      await api.put(`/api/usuarios/actualizarUsuarios/${u.id}`, payload); // :contentReference[oaicite:13]{index=13}
+      await cargarTodo();
+      cancelEdit();
+    } catch (err) {
+      console.error(err);
+      alert(err?.response?.data?.error || "Error al actualizar usuario");
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  // ===== CAMBIAR PASSWORD =====
+  const openPw = (u) => { setPwUser(u); setPw({ a: "", b: "" }); setPwErr(""); setPwOpen(true); };
+  const savePw = async (e) => {
     e.preventDefault();
     setPwErr("");
     if (!pw.a || !pw.b) return setPwErr("Completa ambos campos.");
     if (pw.a.length < 6) return setPwErr("Mínimo 6 caracteres.");
     if (pw.a !== pw.b) return setPwErr("Las contraseñas no coinciden.");
-    setUsers(prev => prev.map(x => x.id === pwUser.id ? { ...x, password: pw.a } : x));
-    setPwOpen(false);
+
+    const u = pwUser;
+    const payload = {
+      empleado_id: u.empleado_id,
+      usuario: u.usuario,
+      clave_hash: pw.a,
+      rol_id: u.rol_id,
+      activo: u.activo ? 1 : 0,
+    };
+    setCargando(true);
+    try {
+      await api.put(`/api/usuarios/actualizarUsuarios/${u.id}`, payload);
+      await cargarTodo();
+      setPwOpen(false);
+    } catch (err) {
+      console.error(err);
+      setPwErr(err?.response?.data?.error || "Error al cambiar contraseña");
+    } finally {
+      setCargando(false);
+    }
   };
 
-  // búsqueda tabla
-  const [q, setQ] = useState("");
+  // ===== FILTRO =====
   const filtrados = useMemo(() => {
     const t = q.trim().toLowerCase();
     if (!t) return users;
     return users.filter(u =>
-      [u.username, u.empleadoNombre, u.role, u.activo ? "activo":"inactivo"]
+      [
+        u.usuario,
+        `${u.empleado_nombre || ""} ${u.empleado_apellido || ""}`,
+        u.rol,
+        u.activo ? "activo" : "inactivo",
+      ]
         .filter(Boolean)
         .map(String)
         .some(v => v.toLowerCase().includes(t))
@@ -213,38 +164,41 @@ export default function Usuarios() {
     <div className="doc-wrap">
       <h2>Usuarios</h2>
 
-      {/* Crear usuario */}
+      {/* Crear */}
       <div className="card" style={{ marginBottom: ".8rem" }}>
         <h3>Crear Usuario</h3>
         <form className="form-grid-3" onSubmit={crear}>
           <label>Empleado
-            <div className="picker-trigger">
-              <input
-                placeholder="Buscar empleado…"
-                value={empQuery}
-                onChange={(e)=>setEmpQuery(e.target.value)}
-                onKeyDown={(e)=>e.key==="Enter" && (e.preventDefault(), setOpenPicker(true))}
-              />
-              <button type="button" className="btn mini" onClick={()=>setOpenPicker(true)}>Buscar</button>
-            </div>
-            {form.empleadoNombre && (
-              <div className="muted" style={{marginTop:".25rem"}}>
-                Seleccionado: <b>{form.empleadoNombre}</b>
-              </div>
-            )}
+            <select
+              value={form.empleado_id}
+              onChange={(e)=>setForm(f=>({...f, empleado_id: e.target.value}))}
+              required
+            >
+              <option value="">Seleccione…</option>
+              {empleados.map(e => (
+                <option key={e.id} value={e.id}>
+                  {e.nombre} {e.apellido}
+                </option>
+              ))}
+            </select>
           </label>
 
           <label>Usuario
-            <input value={form.username} onChange={(e)=>setForm(f=>({...f, username: e.target.value}))} />
+            <input value={form.usuario} onChange={(e)=>setForm(f=>({...f, usuario: e.target.value}))} required />
           </label>
 
           <label>Clave
-            <input type="password" value={form.password} onChange={(e)=>setForm(f=>({...f, password: e.target.value}))} />
+            <input type="password" value={form.clave} onChange={(e)=>setForm(f=>({...f, clave: e.target.value}))} required />
           </label>
 
           <label>Rol
-            <select value={form.role} onChange={(e)=>setForm(f=>({...f, role: e.target.value}))}>
-              {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+            <select
+              value={form.rol_id}
+              onChange={(e)=>setForm(f=>({...f, rol_id: e.target.value}))}
+              required
+            >
+              <option value="">Seleccione…</option>
+              {roles.map(r => <option key={r.id} value={r.id}>{r.nombre}</option>)}
             </select>
           </label>
 
@@ -258,12 +212,12 @@ export default function Usuarios() {
           </label>
 
           <div className="actions end">
-            <button className="btn btn-primary">Guardar</button>
+            <button className="btn btn-primary" disabled={cargando}>Guardar</button>
           </div>
         </form>
       </div>
 
-      {/* Filtro rápido */}
+      {/* Filtro */}
       <div className="inv-toolbar" style={{ marginBottom: ".4rem" }}>
         <input
           className="search big"
@@ -290,29 +244,37 @@ export default function Usuarios() {
               <tr key={u.id}>
                 {editId === u.id ? (
                   <>
-                    <td>{u.username}</td>
-                    <td>{u.empleadoNombre}</td>
+                    <td><b>{u.usuario}</b></td>
+                    <td>{u.empleado_nombre} {u.empleado_apellido}</td>
                     <td>
-                      <select className="mini" value={draft.role} onChange={(e)=>setDraft(d=>({...d, role: e.target.value}))}>
-                        {ROLES.map(r => <option key={r}>{r}</option>)}
+                      <select
+                        className="mini"
+                        value={draft.rol_id}
+                        onChange={(e)=>setDraft(d=>({...d, rol_id: Number(e.target.value)}))}
+                      >
+                        {roles.map(r => <option key={r.id} value={r.id}>{r.nombre}</option>)}
                       </select>
                     </td>
                     <td>
                       <label style={{display:"flex",alignItems:"center",gap:".35rem"}}>
-                        <input type="checkbox" checked={draft.activo} onChange={(e)=>setDraft(d=>({...d, activo: e.target.checked}))}/>
+                        <input
+                          type="checkbox"
+                          checked={draft.activo}
+                          onChange={(e)=>setDraft(d=>({...d, activo: e.target.checked}))}
+                        />
                         {draft.activo ? "Activo" : "Inactivo"}
                       </label>
                     </td>
                     <td className="actions">
-                      <button className="link" onClick={saveEdit}>Guardar</button>
+                      <button className="link" onClick={saveEdit} disabled={cargando}>Guardar</button>
                       <button className="link muted" onClick={cancelEdit}>Cancelar</button>
                     </td>
                   </>
                 ) : (
                   <>
-                    <td><b>{u.username}</b></td>
-                    <td>{u.empleadoNombre}</td>
-                    <td>{u.role}</td>
+                    <td><b>{u.usuario}</b></td>
+                    <td>{u.empleado_nombre} {u.empleado_apellido}</td>
+                    <td>{u.rol}</td>
                     <td>{u.activo ? "Activo" : "Inactivo"}</td>
                     <td className="actions">
                       <button className="link" onClick={()=>startEdit(u)}>Editar</button>
@@ -329,14 +291,6 @@ export default function Usuarios() {
         </table>
       </div>
 
-      {/* Modal picker empleado */}
-      <PickerEmpleado
-        open={openPicker}
-        initialQuery={empQuery}
-        onClose={()=>setOpenPicker(false)}
-        onPick={setEmpleado}
-      />
-
       {/* Modal cambiar contraseña */}
       {pwOpen && (
         <div className="modal-backdrop" onClick={()=>setPwOpen(false)}>
@@ -344,7 +298,7 @@ export default function Usuarios() {
             <h3>Cambiar contraseña</h3>
             <form className="modal-form" onSubmit={savePw}>
               <div className="muted" style={{marginBottom:'.25rem'}}>
-                Usuario: <b>{pwUser?.username}</b>
+                Usuario: <b>{pwUser?.usuario}</b>
               </div>
               <label>Nueva contraseña
                 <input type="password" value={pw.a} onChange={(e)=>setPw(s=>({...s, a:e.target.value}))}/>
@@ -355,7 +309,7 @@ export default function Usuarios() {
               {pwErr && <div className="login-error">{pwErr}</div>}
               <div className="modal-actions">
                 <button type="button" className="btn ghost" onClick={()=>setPwOpen(false)}>Cancelar</button>
-                <button className="btn btn-primary">Guardar</button>
+                <button className="btn btn-primary" disabled={cargando}>Guardar</button>
               </div>
             </form>
           </div>

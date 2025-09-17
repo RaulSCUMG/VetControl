@@ -13,12 +13,12 @@ async function obtener(req, res) {
 
 async function crear(req, res) {
   try {
-    const { nombre } = req.body;
     const { codigo } = req.body;
+    const { nombre } = req.body;
     if (!nombre) return res.status(400).json({ error: "Nombre requerido" });
     if (!codigo) return res.status(400).json({ error: "codigo requerido" });
 
-    const nueva = await Pantallas.crearPantallas(nombre,codigo);
+    const nueva = await Pantallas.crearPantallas(codigo,nombre);
     res.status(201).json(nueva);
   } catch (e) {
     if (e && e.code === "ER_DUP_ENTRY") {
@@ -30,8 +30,8 @@ async function crear(req, res) {
 }
 
 async function actualizar(req, res) {
-  const { nombre } = req.body;
   const { codigo } = req.body;
+  const { nombre } = req.body;
   if (!nombre) return res.status(400).json({ error: "Nombre requerido" });
   if (!codigo) return res.status(400).json({ error: "codigo requerido" });
   const actualizada = await Pantallas.ActualizaPantallas(req.params.id,codigo, nombre);

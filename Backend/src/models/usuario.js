@@ -9,6 +9,8 @@ async function obtenerTodosLosUsuarios() {
       u.activo,
       u.ultimo_login,
       u.creado_en,
+      u.empleado_id,
+      u.rol_id,
       e.nombre AS empleado_nombre,
       e.apellido AS empleado_apellido,
       r.nombre AS rol
@@ -28,6 +30,8 @@ async function obtenerUsuarioPorId(id) {
       u.activo,
       u.ultimo_login,
       u.creado_en,
+      u.empleado_id,
+      u.rol_id,
       e.nombre AS empleado_nombre,
       e.apellido AS empleado_apellido,
       r.nombre AS rol

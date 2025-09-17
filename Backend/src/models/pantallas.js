@@ -11,15 +11,15 @@ async function obtenerPantallasPorID(id) {
   return rows[0];
 }
 
-async function crearPantallas(nombre,codigo) {
+async function crearPantallas(codigo, nombre) {
     const [result] = await pool.query(
     "INSERT INTO pantallas (codigo, nombre) VALUES (?, ?)",
-    [nombre,codigo]
+    [codigo,nombre]
   );
-  return { id: result.insertId, nombre,codigo };
+  return { id: result.insertId, codigo,nombre };
 }
 
-async function ActualizaPantallas(id, nombre,codigo) {
+async function ActualizaPantallas(id, codigo, nombre) {
   await pool.query(
     "UPDATE pantallas SET codigo = ?, nombre = ? WHERE id = ?",
     [codigo, nombre, id]
