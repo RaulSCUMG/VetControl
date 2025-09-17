@@ -34,6 +34,9 @@ export default function Sidebar() {
         <NavLink className="nav-item" to="/roles">
           <FaUserShield /> Roles
         </NavLink>
+        <NavLink className="nav-item" to="/pantallas">
+          <FaUserShield /> Pantallas
+        </NavLink>
         <NavLink className="nav-item" to="/reportes">
           <FaChartLine /> Reportes
         </NavLink>
