@@ -223,7 +223,7 @@ export default function Pacientes() {
                 <label>Raza</label>
                 <input name="raza" value={form.raza} onChange={onChange} />
               </div>
-              <div className="field">
+              <div className="field selectIndividual">
                 <label>Sexo</label>
                 <select name="sexo" value={form.sexo ?? ""} onChange={onChange}>
                   {SEXOS.map((s) => <option key={s} value={s}>{s}</option>)}

@@ -22,9 +22,9 @@ export default function Sidebar() {
         <NavLink className="nav-item" to="/inventario">
           <FaBoxes /> Inventario
         </NavLink>
-        {/* <NavLink className="nav-item" to="/facturacion">
+        <NavLink className="nav-item" to="/facturacion">
           <FaFileInvoice /> Facturación
-        </NavLink> */}
+        </NavLink>
         <NavLink className="nav-item" to="/empleados">
           <FaUserMd /> Empleados
         </NavLink>

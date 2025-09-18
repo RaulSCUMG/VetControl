@@ -1075,3 +1075,11 @@ body.dark-mode .login-card .form-container {
   gap: .35rem;
   font-weight: 500;
 }
+
+.selectIndividual select{
+  height:40px;
+  border-radius:10px;
+  border:1px solid #d9dbe8;
+  padding:0 .6rem;
+  background:white;
+}
