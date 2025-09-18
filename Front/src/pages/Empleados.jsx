@@ -19,8 +19,8 @@ export default function Empleados() {
     apellidoCasada: "",
     dpi: "",
     telefono: "",
-    tipo_empleado_id: null,   // ← ID (requerido por API)
-    especialidad_id: null,    // ← opcional
+    tipo_empleado_id: "",
+    especialidad_id: "",
     activo: true,
   });
 

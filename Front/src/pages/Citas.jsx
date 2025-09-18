@@ -1,136 +1,258 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import api from "../lib/api";
 
 const DIAS = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
-const ESPECIALIDADES = ["Cirugía", "Dermatología"];
-const TURNOS = ["Mañana", "Tarde"];
 
-// Tarjeta simple de cita
-function ApptCard({ a }) {
-  return (
-    <div className="appt">
-      <div className="appt-time">{a.inicio} - {a.fin}</div>
-      <div className="appt-patient">Paciente: <b>{a.paciente}</b></div>
-      <div className="appt-meta">{a.veterinario} • {a.especialidad}</div>
-    </div>
-  );
-}
-
-// Modal sencillo (sin libs)
-function Modal({ open, onClose, onSave }) {
-  const [form, setForm] = useState({
-    dia: 0,
-    inicio: "10:00",
-    paciente: "",
-    veterinario: "",
-    especialidad: ESPECIALIDADES[0]
-  });
-
-  if (!open) return null;
-
-  const onChange = (e) => {
-    const { name, value } = e.target;
-    setForm(f => ({ ...f, [name]: value }));
-  };
-
-  const submit = (e) => {
-    e.preventDefault();
-    onSave({ ...form, dia: Number(form.dia) });
-  };
-
-  return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e)=>e.stopPropagation()}>
-        <h3>Nueva Cita</h3>
-        <form onSubmit={submit} className="modal-form">
-          <label>Día
-            <select name="dia" value={form.dia} onChange={onChange}>
-              {DIAS.map((d,i)=> <option key={d} value={i}>{d}</option>)}
-            </select>
-          </label>
-          <label>Inicio
-            <input type="time" name="inicio" value={form.inicio} onChange={onChange}/>
-          </label>
-          <label>Paciente
-            <input name="paciente" placeholder="Nombre del paciente" value={form.paciente} onChange={onChange} required/>
-          </label>
-          <label>Veterinario
-            <input name="veterinario" placeholder="Nombre del doctor" value={form.veterinario} onChange={onChange} required/>
-          </label>
-          <label>Especialidad
-            <select name="especialidad" value={form.especialidad} onChange={onChange}>
-              {ESPECIALIDADES.map(e => <option key={e}>{e}</option>)}
-            </select>
-          </label>
-
-          <div className="modal-actions">
-            <button type="button" className="btn ghost" onClick={onClose}>Cancelar</button>
-            <button className="btn btn-primary">Guardar</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
+const to2 = (n) => String(n).padStart(2,"0");
+const fmtTime = (d) => `${to2(d.getHours())}:${to2(d.getMinutes())}`;
+const dowMon0 = (d) => (d.getDay() + 6) % 7;
+const joinDt = (yyyyMmDd, hhmm) => `${yyyyMmDd} ${hhmm}:00`;
 
 export default function Citas() {
-  // datos demo
-  const [appts, setAppts] = useState([
-    { dia:0, inicio:"10:00 AM", fin:"11:00 AM", paciente:"Max",   veterinario:"Dra. Pérez", especialidad:"Cirugía" },
-    { dia:0, inicio:"02:00 PM", fin:"03:00 PM", paciente:"Bella", veterinario:"Dr. López",  especialidad:"Dermatología" },
-    { dia:1, inicio:"11:00 AM", fin:"12:00 PM", paciente:"Luna",  veterinario:"Dra. Pérez", especialidad:"Cirugía" },
-  ]);
+  const [appts, setAppts] = useState([]);
+  const [pacientes, setPacientes] = useState([]);
+  const [empleados, setEmpleados] = useState([]);
+  const [especialidades, setEspecialidades] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState("");
 
-  const [fechaBase, setFechaBase] = useState(""); // (decorativo)
-  const [filtros, setFiltros] = useState({ especialidad: new Set(), turno: new Set() });
+  // modal
   const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({
+    paciente_id: "",
+    veterinario_id: "",
+    especialidad_id: "",
+    fecha: "",
+    hora_inicio: "10:00",
+    hora_fin: "10:30",
+    notas: ""
+  });
 
-  const toggle = (grupo, valor) => {
-    setFiltros(f => {
-      const s = new Set(f[grupo]);
-      s.has(valor) ? s.delete(valor) : s.add(valor);
-      return { ...f, [grupo]: s };
-    });
+  const EMPTY_FORM = {
+    paciente_id: "",
+    veterinario_id: "",
+    especialidad_id: "",
+    fecha: "",
+    hora_inicio: "10:00",
+    hora_fin: "10:30",
+    notas: ""
+  };
+  const nueva = () => {
+    setForm(EMPTY_FORM);
+    setOpen(true);
   };
 
-  const filtradas = useMemo(() => {
-    return appts.filter(a => {
-      const espOK = filtros.especialidad.size ? filtros.especialidad.has(a.especialidad) : true;
-      const turOK = filtros.turno.size ? filtros.turno.has(a.turno) : true;
-      return espOK && turOK;
-    });
-  }, [appts, filtros]);
+  // cargar catálogos + citas
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        setErr("");
+        const [cRes, pRes, eRes, esRes] = await Promise.all([
+          api.get("/api/citas/listarCitas"),
+          api.get("/api/paciente/listarPaciente"),
+          api.get("/api/empleados/listarEmpleados"),
+          api.get("/api/especialidades/listarEspecialidades"),
+        ]);
+        setAppts((cRes.data || []).map(fromApiCita));
+        setPacientes(pRes.data || []);
+        setEmpleados(eRes.data || []);
+        setEspecialidades(esRes.data || []);
+      } catch (e) {
+        setErr(e?.response?.data?.error || "Error cargando agenda");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
-  const guardar = (a) => {
-    // normalizar hora a formato lindo
-    const fix = (h) => h.includes(":") && !h.toUpperCase().includes("M") ? 
-      (Number(h.split(":")[0]) >= 12 ? h+" PM" : h+" AM") : h;
-    setAppts(prev => [...prev, { ...a, inicio: fix(a.inicio), fin: fix(a.fin) }]);
-    setOpen(false);
+  const veterinarios = useMemo(
+    () =>
+      (empleados || []).filter(
+        (e) => (e.tipo_empleado || "").toLowerCase() === "veterinario" && e.activo !== 0
+      ),
+    [empleados]
+  );
+
+  // mappers
+  function fromApiCita(c) {
+    const d1 = new Date(c.fecha_inicio);
+    const d2 = c.fecha_fin ? new Date(c.fecha_fin) : null;
+    return {
+      id: c.id,
+      dia: dowMon0(d1),
+      inicio: fmtTime(d1),
+      fin: d2 ? fmtTime(d2) : "",
+      paciente: c.paciente,
+      veterinario: c.veterinario || "(sin asignar)",
+      especialidad: c.especialidad || "",
+      fecha_inicio: c.fecha_inicio,
+      fecha_fin: c.fecha_fin || null,
+      estado: c.estado,
+      notas: c.notas || ""
+    };
+  }
+
+  // util nombres por id
+  const pacName = (id) => pacientes.find(p => p.id === Number(id))?.nombre || "";
+  const vetName = (id) => {
+    const e = empleados.find(v => v.id === Number(id));
+    return e ? [e.nombre, e.nombre2, e.apellido, e.apellido2].filter(Boolean).join(" ") : "";
   };
+  const espName = (id) => especialidades.find(es => es.id === Number(id))?.nombre || "";
+
+  // crear
+  const guardar = async (e) => {
+    e.preventDefault();
+    try {
+      if (!form.paciente_id || !form.fecha || !form.hora_inicio) {
+        alert("Paciente, fecha y hora inicio son requeridos");
+        return;
+      }
+      const payload = {
+        paciente_id: Number(form.paciente_id),
+        veterinario_id: form.veterinario_id ? Number(form.veterinario_id) : null,
+        especialidad_id: form.especialidad_id ? Number(form.especialidad_id) : null,
+        fecha_inicio: joinDt(form.fecha, form.hora_inicio),
+        fecha_fin: form.hora_fin ? joinDt(form.fecha, form.hora_fin) : null,
+        notas: form.notas || null,
+      };
+      const { data } = await api.post("/api/citas/crearCitas", payload);
+      // crearCita devuelve ids; armamos nombres para la tarjeta
+      const d1 = new Date(payload.fecha_inicio);
+      const d2 = payload.fecha_fin ? new Date(payload.fecha_fin) : null;
+      const nuevo = {
+        id: data.id,
+        dia: dowMon0(d1),
+        inicio: fmtTime(d1),
+        fin: d2 ? fmtTime(d2) : "",
+        paciente: pacName(payload.paciente_id),
+        veterinario: vetName(payload.veterinario_id),
+        especialidad: espName(payload.especialidad_id),
+        estado: "Programada",
+        notas: form.notas || ""
+      };
+      setAppts(prev => [...prev, nuevo]);
+      setOpen(false);
+      setForm(f => ({ ...f, notas: "" }));
+    } catch (e2) {
+      alert(e2?.response?.data?.error || "Error al crear cita");
+    }
+  };
+
+  // eliminar
+  const eliminar = async (id) => {
+    if (!confirm("¿Eliminar cita?")) return;
+    try {
+      await api.delete(`/api/citas/EliminarCitas/${id}`);
+      setAppts(prev => prev.filter(a => a.id !== id));
+    } catch (e) {
+      alert(e?.response?.data?.error || "Error al eliminar cita");
+    }
+  };
+
+  // Vista por día
+  const porDia = useMemo(() => {
+    const m = Array.from({ length: 7 }, () => []);
+    for (const a of appts) m[a.dia].push(a);
+    m.forEach(arr => arr.sort((x,y) => x.inicio.localeCompare(y.inicio)));
+    return m;
+  }, [appts]);
 
   return (
     <div className="agenda-wrap">
       <div className="agenda-header">
         <h2>🗓️ Agenda Semanal</h2>
-        <input className="date-input" type="date" value={fechaBase} onChange={(e)=>setFechaBase(e.target.value)} placeholder="YYYY-MM-DD"/>
+        <button className="btn btn-primary" onClick={nueva}>+ Nueva Cita</button>
       </div>
 
-      <div className="agenda-grid">
-        {/* columnas Lunes-Domingo */}
-        {DIAS.map((d,i)=>(
-          <div className="day-col" key={d}>
-            <div className="day-title">{d}</div>
-            <div className="day-body">
-              {filtradas.filter(a=>a.dia===i).map((a,idx)=><ApptCard key={idx} a={a} />)}
+      {err && <div className="alert error">{err}</div>}
+      {loading ? (
+        <div className="skeleton">Cargando…</div>
+      ) : (
+        <div className="agenda-grid">
+          {DIAS.map((d, i) => (
+            <div className="day-col" key={d}>
+              <div className="day-title">{d}</div>
+              <div className="day-body">
+                {porDia[i].length === 0 ? (
+                  <div className="muted">Sin citas</div>
+                ) : (
+                  porDia[i].map(a => (
+                    <div className="appt" key={a.id}>
+                      <div className="appt-time">{a.inicio}{a.fin ? ` - ${a.fin}` : ""}</div>
+                      <div className="appt-patient">Paciente: <b>{a.paciente}</b></div>
+                      <div className="appt-meta">{a.veterinario || "—"} {a.especialidad ? `• ${a.especialidad}` : ""}</div>
+                      <div className="appt-actions">
+                        <button className="link muted" onClick={() => eliminar(a.id)}>Eliminar</button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
+          ))}
+        </div>
+      )}
+
+      {/* Modal Crear */}
+      {open && (
+        <div className="modal-backdrop" onClick={() => setOpen(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Nueva Cita</h3>
+            <form className="modal-form" onSubmit={guardar}>
+              <label>Paciente *</label>
+              <select
+                value={form.paciente_id}
+                onChange={(e) => setForm(f => ({ ...f, paciente_id: e.target.value }))}
+                required
+              >
+                <option value="">Seleccione…</option>
+                {pacientes.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
+              </select>
+
+              <label>Veterinario</label>
+              <select
+                value={form.veterinario_id ?? ""}
+                onChange={(e) => setForm(f => ({ ...f, veterinario_id: e.target.value }))}
+              >
+                <option value="">(sin asignar)</option>
+                {veterinarios.map(v => (
+                  <option key={v.id} value={v.id}>
+                    {[v.nombre, v.nombre2, v.apellido, v.apellido2].filter(Boolean).join(" ")}
+                  </option>
+                ))}
+              </select>
+
+              <label>Especialidad</label>
+              <select
+                value={form.especialidad_id ?? ""}
+                onChange={(e) => setForm(f => ({ ...f, especialidad_id: e.target.value }))}
+              >
+                <option value="">(ninguna)</option>
+                {especialidades.map(es => <option key={es.id} value={es.id}>{es.nombre}</option>)}
+              </select>
+
+              <label>Fecha *</label>
+              <input type="date" value={form.fecha} onChange={(e)=>setForm(f=>({...f, fecha:e.target.value}))} required />
+
+              <label>Hora inicio *</label>
+              <input type="time" value={form.hora_inicio} onChange={(e)=>setForm(f=>({...f, hora_inicio:e.target.value}))} required />
+
+              <label>Hora fin</label>
+              <input type="time" value={form.hora_fin} onChange={(e)=>setForm(f=>({...f, hora_fin:e.target.value}))} />
+
+              <label>Notas</label>
+              <input value={form.notas} onChange={(e)=>setForm(f=>({...f, notas:e.target.value}))} placeholder="Motivo, observaciones…" />
+
+              <div className="modal-actions">
+                <button type="button" className="btn ghost" onClick={() => setOpen(false)}>Cancelar</button>
+                <button className="btn btn-primary">Guardar</button>
+              </div>
+            </form>
           </div>
-        ))}
-      </div>
-
-      {/* Botón flotante */}
-      <button className="fab" onClick={()=>setOpen(true)}>+ Nueva Cita</button>
-
-      <Modal open={open} onClose={()=>setOpen(false)} onSave={guardar} />
+        </div>
+      )}
     </div>
   );
 }

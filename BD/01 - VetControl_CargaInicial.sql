@@ -66,7 +66,7 @@ CREATE TABLE `citas` (
   CONSTRAINT `citas_ibfk_1` FOREIGN KEY (`paciente_id`) REFERENCES `pacientes` (`id`),
   CONSTRAINT `citas_ibfk_2` FOREIGN KEY (`veterinario_id`) REFERENCES `empleados` (`id`),
   CONSTRAINT `citas_ibfk_3` FOREIGN KEY (`especialidad_id`) REFERENCES `especialidades` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -75,6 +75,7 @@ CREATE TABLE `citas` (
 
 LOCK TABLES `citas` WRITE;
 /*!40000 ALTER TABLE `citas` DISABLE KEYS */;
+INSERT INTO `citas` VALUES (1,1,4,8,'2025-09-19 10:00:00','2025-09-19 10:30:00','Programada','tiene mocos','2025-09-18 05:22:43'),(2,2,4,2,'2025-09-15 10:00:00','2025-09-15 10:30:00','Programada','manchas en la lengua','2025-09-18 05:27:11'),(3,2,4,5,'2025-09-19 12:00:00','2025-09-19 13:00:00','Programada','seguimiento','2025-09-18 05:28:00');
 /*!40000 ALTER TABLE `citas` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -105,7 +106,7 @@ CREATE TABLE `empleados` (
   KEY `especialidad_id` (`especialidad_id`),
   CONSTRAINT `empleados_ibfk_1` FOREIGN KEY (`tipo_empleado_id`) REFERENCES `tipos_empleado` (`id`),
   CONSTRAINT `empleados_ibfk_2` FOREIGN KEY (`especialidad_id`) REFERENCES `especialidades` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -114,6 +115,7 @@ CREATE TABLE `empleados` (
 
 LOCK TABLES `empleados` WRITE;
 /*!40000 ALTER TABLE `empleados` DISABLE KEYS */;
+INSERT INTO `empleados` VALUES (1,'Raul','Eduardo','Sologaistoa','Castillo',NULL,NULL,'2408630700108','41285375',5,NULL,1,'2025-09-18 02:14:04'),(2,'Administrador',NULL,'Administrador',NULL,NULL,NULL,'9999999999999','22554422',5,NULL,1,'2025-09-18 02:28:16'),(3,'Alejandro','William','Ochoa','Diaz',NULL,NULL,'2408630700111','41285375',4,NULL,1,'2025-09-18 04:11:32'),(4,'Dylan','Altair','Quevedo',NULL,NULL,NULL,'2408630700112','44556611',1,8,1,'2025-09-18 05:21:13');
 /*!40000 ALTER TABLE `empleados` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -292,7 +294,7 @@ CREATE TABLE `pacientes` (
   `correo_resp` varchar(120) DEFAULT NULL,
   `creado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -301,6 +303,7 @@ CREATE TABLE `pacientes` (
 
 LOCK TABLES `pacientes` WRITE;
 /*!40000 ALTER TABLE `pacientes` DISABLE KEYS */;
+INSERT INTO `pacientes` VALUES (1,'Tayzon','Perro','Cruzado','Macho','2024-04-01','ninguna','ninguna','ninguno','Dylan Sologaistoa','41285375','dylans@gmail.com','2025-09-18 05:01:12'),(2,'Michi','Gato','tuxeado','Macho','2020-03-15','ninguna','ninguna','riñones','Christian Diaz','22554466','christiand@gmail.com','2025-09-18 05:02:54');
 /*!40000 ALTER TABLE `pacientes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -317,7 +320,7 @@ CREATE TABLE `pantallas` (
   `nombre` varchar(60) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `codigo` (`codigo`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -326,7 +329,7 @@ CREATE TABLE `pantallas` (
 
 LOCK TABLES `pantallas` WRITE;
 /*!40000 ALTER TABLE `pantallas` DISABLE KEYS */;
-INSERT INTO `pantallas` VALUES (1,'dashboard','Dashboard'),(2,'pacientes','Pacientes'),(3,'citas','Citas'),(4,'inventario','Inventario'),(5,'facturacion','Facturación'),(6,'reportes','Reportes'),(7,'empleados','Empleados'),(8,'usuarios','Usuarios'),(9,'roles','Roles');
+INSERT INTO `pantallas` VALUES (1,'dashboard','Dashboard'),(2,'pacientes','Pacientes'),(3,'citas','Citas'),(4,'inventario','Inventario'),(5,'facturacion','Facturación'),(6,'reportes','Reportes'),(7,'empleados','Empleados'),(8,'usuarios','Usuarios'),(9,'roles','Roles'),(10,'pantallas','Pantallas');
 /*!40000 ALTER TABLE `pantallas` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -352,7 +355,7 @@ CREATE TABLE `productos` (
   UNIQUE KEY `codigo` (`codigo`),
   KEY `categoria_id` (`categoria_id`),
   CONSTRAINT `productos_ibfk_1` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -361,6 +364,7 @@ CREATE TABLE `productos` (
 
 LOCK TABLES `productos` WRITE;
 /*!40000 ALTER TABLE `productos` DISABLE KEYS */;
+INSERT INTO `productos` VALUES (1,'P000001','Rabia Canina',1,NULL,150,5,350.00,1,'2025-09-18 04:27:33'),(2,'P000002','Consulta General',4,NULL,0,0,150.00,1,'2025-09-18 04:28:44');
 /*!40000 ALTER TABLE `productos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -376,7 +380,7 @@ CREATE TABLE `roles` (
   `nombre` varchar(60) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nombre` (`nombre`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -385,7 +389,7 @@ CREATE TABLE `roles` (
 
 LOCK TABLES `roles` WRITE;
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
-INSERT INTO `roles` VALUES (1,'Administrador'),(3,'Bodega'),(2,'Recepción'),(4,'Veterinario');
+INSERT INTO `roles` VALUES (1,'Administrador'),(3,'Bodega'),(2,'Recepción'),(5,'Recursos Humanos'),(4,'Veterinario');
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -412,7 +416,7 @@ CREATE TABLE `roles_pantallas` (
 
 LOCK TABLES `roles_pantallas` WRITE;
 /*!40000 ALTER TABLE `roles_pantallas` DISABLE KEYS */;
-INSERT INTO `roles_pantallas` VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9);
+INSERT INTO `roles_pantallas` VALUES (1,1),(2,1),(3,1),(5,1),(1,2),(2,2),(1,3),(2,3),(1,4),(3,4),(1,5),(2,5),(1,6),(2,6),(3,6),(1,7),(5,7),(1,8),(5,8),(1,9),(1,10);
 /*!40000 ALTER TABLE `roles_pantallas` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -463,7 +467,7 @@ CREATE TABLE `usuarios` (
   KEY `rol_id` (`rol_id`),
   CONSTRAINT `usuarios_ibfk_1` FOREIGN KEY (`empleado_id`) REFERENCES `empleados` (`id`),
   CONSTRAINT `usuarios_ibfk_2` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -472,6 +476,7 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
+INSERT INTO `usuarios` VALUES (1,2,'admin','$2b$10$AxVlPNHl/3ClKfTO/qBd9.loOgR7aszP.fvnItI7tqdZ8XVd1Oh0a',1,1,NULL,'2025-09-18 02:28:38'),(2,1,'rauls','$2b$10$S/wxDATeykhlHpvQ/u52FeDs6Yo/q2ZZmLhTVbSMVDQMXBR.Bekle',1,1,'2025-09-17 23:18:10','2025-09-18 02:36:43');
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -522,4 +527,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-09-11 15:01:57
+-- Dump completed on 2025-09-17 23:30:43

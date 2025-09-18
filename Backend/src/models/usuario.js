@@ -67,10 +67,33 @@ async function eliminarUsuario(id) {
   return result.affectedRows > 0;
 }
 
+async function obtenerUsuarioPorUsuario(username) {
+  const [rows] = await pool.query(`
+    SELECT 
+      u.id, u.usuario, u.clave_hash, u.activo, u.ultimo_login, u.creado_en,
+      u.empleado_id, u.rol_id,
+      e.nombre  AS empleado_nombre, e.apellido AS empleado_apellido,
+      r.nombre  AS rol
+    FROM usuarios u
+    INNER JOIN empleados e ON u.empleado_id = e.id
+    INNER JOIN roles r ON u.rol_id = r.id
+    WHERE u.usuario = ?
+    LIMIT 1
+  `, [username]);
+  return rows[0];
+}
+
+async function actualizarUltimoLogin(id) {
+  await pool.query(`UPDATE usuarios SET ultimo_login = NOW() WHERE id = ?`, [id]);
+  return true;
+}
+
 module.exports = {
   obtenerTodosLosUsuarios,
   obtenerUsuarioPorId,
   crearUsuario,
   actualizarUsuario,
-  eliminarUsuario
+  eliminarUsuario,
+  obtenerUsuarioPorUsuario,
+  actualizarUltimoLogin
 };

@@ -1,211 +1,275 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import api from "../lib/api";
 
+const SEXOS = ["Macho", "Hembra", "Otro"];
 
-export default function Patients() {
+export default function Pacientes() {
+  const [tab, setTab] = useState("Listado");
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState("");
+
+  const [q, setQ] = useState("");
+  const [editingId, setEditingId] = useState(null);
+
   const [form, setForm] = useState({
-    nombre: "", especie: "", raza: "", sexo: "",
-    nacimiento: "",
-    vacunas: "", alergias: "", tratamientos: "",
-    responsable: "", telefono: "", correo: "",
-    archivo: null
+    nombre: "", especie: "", raza: "", sexo: "Macho",
+    nacimiento: "", vacunas: "", alergias: "", tratamientos: "",
+    responsable: "", telefono: "", correo: ""
   });
 
-  // pestañas y almacenamiento local de pacientes ---
-  const [tab, setTab] = useState("Registro"); // "Registro" | "Listado"
-  const [pacientes, setPacientes] = useState([]);
-  const [editingIndex, setEditingIndex] = useState(-1);
-  const [q, setQ] = useState("");
+  // --- helpers: API <-> UI
+  const fromApi = (p) => ({
+    id: p.id,
+    nombre: p.nombre || "",
+    especie: p.especie || "",
+    raza: p.raza || "",
+    sexo: p.sexo || "Macho",
+    nacimiento: p.fecha_nacimiento || "",
+    vacunas: p.vacunas || "",
+    alergias: p.alergias || "",
+    tratamientos: p.tratamientos || "",
+    responsable: p.responsable || "",
+    telefono: p.telefono_resp || "",
+    correo: p.correo_resp || "",
+  });
 
-  const onChange = (e) => {
-    const { name, value, files } = e.target;
-    setForm(f => ({ ...f, [name]: files ? files[0] : value }));
-  };
+  const toApi = (f) => ({
+    nombre: f.nombre?.trim(),
+    especie: f.especie?.trim(),
+    raza: f.raza?.trim() || null,
+    sexo: f.sexo || "Macho",
+    fecha_nacimiento: f.nacimiento || null,
+    vacunas: f.vacunas?.trim() || null,
+    alergias: f.alergias?.trim() || null,
+    tratamientos: f.tratamientos?.trim() || null,
+    responsable: f.responsable?.trim(),
+    telefono_resp: f.telefono?.trim() || null,
+    correo_resp: f.correo?.trim() || null,
+  });
 
-  const guardar = (e) => {
-    e.preventDefault();
-    // aquí podrías enviar a tu API
-    console.log("Datos a guardar:", form);
-
-    //crear/actualizar en memoria y pasar a Listado ---
-    setPacientes(prev => {
-      if (editingIndex >= 0) {
-        const copy = [...prev];
-        copy[editingIndex] = { ...form };
-        return copy;
+  // --- carga inicial
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        setErr("");
+        const { data } = await api.get("/api/paciente/listarPaciente");
+        setItems((data || []).map(fromApi));
+      } catch (e) {
+        setErr(e?.response?.data?.error || "Error cargando pacientes");
+      } finally {
+        setLoading(false);
       }
-      return [{ ...form }, ...prev];
-    });
-    setEditingIndex(-1);
-    setTab("Listado");
+    })();
+  }, []);
 
-    alert("Paciente guardado");
+  const filtrados = useMemo(() => {
+    if (!q.trim()) return items;
+    const g = q.toLowerCase();
+    return items.filter((p) =>
+      [p.nombre, p.especie, p.raza, p.sexo, p.responsable, p.telefono, p.correo]
+        .map((v) => String(v || ""))
+        .some((v) => v.toLowerCase().includes(g))
+    );
+  }, [items, q]);
+
+  // --- acciones
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
   };
 
-  // acciones de la tabla ---
-  const editar = (idx) => {
-    setEditingIndex(idx);
-    setForm({ ...pacientes[idx] });
+  const nuevo = () => {
+    setEditingId(null);
+    setForm({
+      nombre: "", especie: "", raza: "", sexo: "Macho",
+      nacimiento: "", vacunas: "", alergias: "", tratamientos: "",
+      responsable: "", telefono: "", correo: ""
+    });
     setTab("Registro");
   };
 
-  const eliminar = (idx) => {
-    if (!window.confirm("¿Eliminar paciente?")) return;
-    setPacientes(prev => prev.filter((_, i) => i !== idx));
-    if (editingIndex === idx) setEditingIndex(-1);
+  const editar = (it) => {
+    setEditingId(it.id);
+    setForm({ ...it });
+    setTab("Registro");
   };
 
-  const filtrados = pacientes.filter(p =>
-    [p.nombre, p.especie, p.raza, p.sexo, p.responsable, p.telefono, p.correo]
-      .filter(Boolean)
-      .some(v => String(v).toLowerCase().includes(q.toLowerCase()))
-  );
+  const eliminar = async (id) => {
+    if (!confirm("¿Eliminar paciente?")) return;
+    try {
+      await api.delete(`/api/paciente/EliminarPaciente/${id}`);
+      setItems((prev) => prev.filter((x) => x.id !== id));
+    } catch (e) {
+      alert(e?.response?.data?.error || "Error al eliminar");
+    }
+  };
+
+  const guardar = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = toApi(form);
+      if (!payload.nombre || !payload.especie || !payload.responsable) {
+        alert("Nombre, especie y responsable son requeridos");
+        return;
+      }
+
+      if (editingId) {
+        await api.put(`/api/paciente/actualizarPaciente/${editingId}`, payload);
+        setItems((prev) =>
+          prev.map((x) => (x.id === editingId ? { ...form, id: editingId } : x))
+        );
+      } else {
+        const { data } = await api.post("/api/paciente/crearPaciente", payload);
+        setItems((prev) => [{ ...fromApi(data) }, ...prev]);
+      }
+
+      setTab("Listado");
+      setEditingId(null);
+    } catch (e2) {
+      alert(e2?.response?.data?.error || "Error al guardar");
+    }
+  };
 
   return (
     <>
-      {/* barra de pestañas arriba */}
+      {/* Tabs */}
       <div className="card" style={{ paddingBottom: 8, marginBottom: 12 }}>
         <div className="tabs">
-          {["Registro", "Pacientes Registrados"].map(t => (
-            <button
-              key={t}
-              className={`pill ${tab === t ? "active" : ""}`}
-              onClick={() => setTab(t)}
-            >
+          {["Listado", "Registro"].map((t) => (
+            <button key={t} className={`pill ${tab === t ? "active" : ""}`} onClick={() => setTab(t)}>
               {t}
             </button>
           ))}
         </div>
       </div>
 
-      {/* pestaña de LISTADO con tabla y acciones */}
       {tab === "Listado" && (
         <div className="card">
-          <div className="actions" style={{ marginBottom: 25 }}>
+          <div className="actions" style={{ marginBottom: 20 }}>
             <input
-              className="field"
-              placeholder="Buscar Paciente, Raza..."
+              className="search big"
+              placeholder="Buscar por nombre, especie, responsable…"
               value={q}
               onChange={(e) => setQ(e.target.value)}
             />
             <div className="spacer" />
-            <button className="btn" onClick={() => setTab("Registro")}>+ Nuevo</button>
+            <button className="btn btn-primary" onClick={nuevo}>+ Nuevo</button>
           </div>
 
-          <div className="table-card">
-            <table className="table table-hover table-zebra">
-              <thead>
-                <tr>
-                  <th>NOMBRE</th>
-                  <th>ESPECIE</th>
-                  <th>RAZA</th>
-                  <th>SEXO</th>
-                  <th>NACIMIENTO</th>
-                  <th>RESPONSABLE</th>
-                  <th>TELÉFONO</th>
-                  <th>CORREO</th>
-                  <th style={{ width: 140 }}>ACCIONES</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtrados.map((p, idx) => (
-                  <tr key={idx}>
-                    <td>{p.nombre}</td>
-                    <td>{p.especie}</td>
-                    <td>{p.raza}</td>
-                    <td>{p.sexo}</td>
-                    <td>{p.nacimiento}</td>
-                    <td>{p.responsable}</td>
-                    <td>{p.telefono}</td>
-                    <td>{p.correo}</td>
-                    <td>
-                      <div className="actions" style={{ gap: 8 }}>
-                        <button className="btn" onClick={() => editar(idx)}>Editar</button>
-                        <button className="btn" onClick={() => eliminar(idx)}>Eliminar</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                {!filtrados.length && (
+          {err && <div className="alert error">{err}</div>}
+          {loading ? (
+            <div className="skeleton">Cargando…</div>
+          ) : (
+            <div className="table-card">
+              <table className="table">
+                <thead>
                   <tr>
-                    <td colSpan={9} className="muted">Sin registros</td>
+                    <th>NOMBRE</th>
+                    <th>ESPECIE</th>
+                    <th>RAZA</th>
+                    <th>SEXO</th>
+                    <th>NACIMIENTO</th>
+                    <th>RESPONSABLE</th>
+                    <th>TELÉFONO</th>
+                    <th>CORREO</th>
+                    <th>ACCIONES</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filtrados.map((p) => (
+                    <tr key={p.id}>
+                      <td>{p.nombre}</td>
+                      <td>{p.especie}</td>
+                      <td>{p.raza || "—"}</td>
+                      <td>{p.sexo}</td>
+                      <td>{p.nacimiento || "—"}</td>
+                      <td>{p.responsable}</td>
+                      <td>{p.telefono || "—"}</td>
+                      <td>{p.correo || "—"}</td>
+                      <td className="actions">
+                        <button className="link" onClick={() => editar(p)}>Editar</button>
+                        <button className="link muted" onClick={() => eliminar(p.id)}>Eliminar</button>
+                      </td>
+                    </tr>
+                  ))}
+                  {!filtrados.length && (
+                    <tr><td colSpan={9} className="muted">Sin registros</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 
-      {/*  Registro */}
       {tab === "Registro" && (
         <div className="card form-card">
-          <h2 className="form-title">Registro de Paciente</h2>
+          <h2 className="form-title">{editingId ? "Editar Paciente" : "Registro de Paciente"}</h2>
 
           <form onSubmit={guardar} className="form-body">
-            {/* Sección: Datos Generales */}
             <h4 className="section-title">Datos Generales</h4>
             <div className="form-grid">
               <div className="field">
-                <label htmlFor="nombre">Nombre</label>
-                <input id="nombre" name="nombre" placeholder="Nombre del paciente" value={form.nombre} onChange={onChange}/>
+                <label>Nombre *</label>
+                <input name="nombre" value={form.nombre} onChange={onChange} required />
               </div>
               <div className="field">
-                <label htmlFor="especie">Especie</label>
-                <input id="especie" name="especie" placeholder="Especie" value={form.especie} onChange={onChange}/>
+                <label>Especie *</label>
+                <input name="especie" value={form.especie} onChange={onChange} required />
               </div>
               <div className="field">
-                <label htmlFor="raza">Raza</label>
-                <input id="raza" name="raza" placeholder="Raza" value={form.raza} onChange={onChange}/>
+                <label>Raza</label>
+                <input name="raza" value={form.raza} onChange={onChange} />
               </div>
               <div className="field">
-                <label htmlFor="sexo">Sexo</label>
-                <input id="sexo" name="sexo" placeholder="Sexo" value={form.sexo} onChange={onChange}/>
+                <label>Sexo</label>
+                <select name="sexo" value={form.sexo ?? ""} onChange={onChange}>
+                  {SEXOS.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
               </div>
               <div className="field col-2">
-                <label htmlFor="nacimiento">Fecha de Nacimiento</label>
-                <input id="nacimiento" name="nacimiento" type="date" placeholder="YYYY-MM-DD" value={form.nacimiento} onChange={onChange}/>
+                <label>Fecha de Nacimiento</label>
+                <input type="date" name="nacimiento" value={form.nacimiento} onChange={onChange} />
               </div>
-            </div>      
+            </div>
 
-            {/* Sección: Datos Clínicos */}
             <h4 className="section-title">Datos Clínicos</h4>
             <div className="form-grid">
               <div className="field">
-                <label htmlFor="vacunas">Vacunas</label>
-                <input id="vacunas" name="vacunas" placeholder="Vacunas" value={form.vacunas} onChange={onChange}/>
+                <label>Vacunas</label>
+                <input name="vacunas" value={form.vacunas} onChange={onChange} />
               </div>
               <div className="field">
-                <label htmlFor="alergias">Alergias</label>
-                <input id="alergias" name="alergias" placeholder="Alergias" value={form.alergias} onChange={onChange}/>
+                <label>Alergias</label>
+                <input name="alergias" value={form.alergias} onChange={onChange} />
               </div>
               <div className="field col-2">
-                <label htmlFor="tratamientos">Tratamientos Actuales</label>
-                <input id="tratamientos" name="tratamientos" placeholder="Tratamientos Actuales" value={form.tratamientos} onChange={onChange}/>
+                <label>Tratamientos</label>
+                <input name="tratamientos" value={form.tratamientos} onChange={onChange} />
               </div>
             </div>
 
-            {/* Sección: Responsable */}
-            <h4 className="section-title">Responsable</h4>
+            <h4 className="section-title">Responsable *</h4>
             <div className="form-grid">
               <div className="field">
-                <label htmlFor="responsable">Nombre</label>
-                <input id="responsable" name="responsable" placeholder="Nombre del responsable" value={form.responsable} onChange={onChange}/>
+                <label>Nombre *</label>
+                <input name="responsable" value={form.responsable} onChange={onChange} required />
               </div>
               <div className="field">
-                <label htmlFor="telefono">Teléfono</label>
-                <input id="telefono" name="telefono" placeholder="Teléfono" value={form.telefono} onChange={onChange}/>
+                <label>Teléfono</label>
+                <input name="telefono" value={form.telefono} onChange={onChange} />
               </div>
               <div className="field col-2">
-                <label htmlFor="correo">Correo</label>
-                <input id="correo" name="correo" type="email" placeholder="Correo electrónico" value={form.correo} onChange={onChange}/>
+                <label>Correo</label>
+                <input type="email" name="correo" value={form.correo} onChange={onChange} />
               </div>
             </div>
 
-            {/* Footer acciones */}
             <div className="form-footer">
-              <button type="submit" className="btn btn-primary">Guardar</button>
-              <button type="button" className="btn ghost" onClick={() => window.history.back()}>Cancelar</button>
-              <button type="button" className="btn btn-primary outline">Acceso Rápido a Ficha Clínica</button>
+              <button className="btn btn-primary">{editingId ? "Guardar cambios" : "Guardar"}</button>
+              <button type="button" className="btn ghost" onClick={() => setTab("Listado")}>Cancelar</button>
             </div>
           </form>
         </div>

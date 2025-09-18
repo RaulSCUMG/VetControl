@@ -1,72 +1,108 @@
-const usuarioModel = require("../models/usuario");
+const bcrypt = require("bcryptjs");
+const Usuario = require("../models/usuario");
 
+// LISTAR
 async function listar(req, res) {
   try {
-    const usuarios = await usuarioModel.obtenerTodosLosUsuarios();
-    res.json(usuarios);
-  } catch (error) {
-    console.error("Error al obtener usuarios:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    const usuarios = await Usuario.obtenerTodosLosUsuarios();
+    const safe = usuarios.map(u => ({ ...u, clave_hash: undefined }));
+    res.json(safe);
+  } catch (e) {
+    console.error("Error listar usuarios:", e);
+    res.status(500).json({ error: e?.sqlMessage || "Error interno" });
   }
 }
 
+// OBTENER POR ID
 async function obtener(req, res) {
   try {
-    const { id } = req.params;
-    const usuario = await usuarioModel.obtenerUsuarioPorId(id);
-    if (!usuario) {
-      return res.status(404).json({ error: "Usuario no encontrado" });
-    }
+    const usuario = await Usuario.obtenerUsuarioPorId(req.params.id);
+    if (!usuario) return res.status(404).json({ error: "No encontrado" });
+    delete usuario.clave_hash;
     res.json(usuario);
-  } catch (error) {
-    console.error("Error al obtener usuario:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+  } catch (e) {
+    console.error("Error obtener usuario:", e);
+    res.status(500).json({ error: e?.sqlMessage || "Error interno" });
   }
 }
 
 async function crear(req, res) {
   try {
-    const { empleado_id, usuario, clave_hash, rol_id } = req.body;
-    const nuevoId = await usuarioModel.crearUsuario({ empleado_id, usuario, clave_hash, rol_id });
-    res.status(201).json({ message: "Usuario creado correctamente", id: nuevoId });
-  } catch (error) {
-    console.error("Error al crear usuario:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    const { empleado_id, usuario, rol_id, activo } = req.body;
+    const plain = req.body.clave ?? req.body.clave_hash;
+
+    if (!empleado_id || !usuario || !plain || !rol_id) {
+      return res.status(400).json({ error: "empleado_id, usuario, clave y rol_id son requeridos" });
+    }
+
+    const hashed = await bcrypt.hash(String(plain), 10);
+
+    const nuevo = await Usuario.crearUsuario({
+      empleado_id: Number(empleado_id),
+      usuario: String(usuario).trim(),
+      clave_hash: hashed,
+      rol_id: Number(rol_id),
+      activo: activo ? 1 : 0,
+    });
+
+    if (nuevo) delete nuevo.clave_hash;
+    res.status(201).json(nuevo);
+  } catch (e) {
+    console.error("Error crear usuario:", e);
+    if (e?.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({ error: "Usuario duplicado" });
+    }
+    res.status(500).json({ error: e?.sqlMessage || "Error interno" });
   }
 }
 
 async function actualizar(req, res) {
   try {
-    const { id } = req.params;
-    const actualizado = await usuarioModel.actualizarUsuario(id, req.body);
-    if (!actualizado) {
-      return res.status(404).json({ error: "Usuario no encontrado" });
+    const id = Number(req.params.id);
+    const { empleado_id, usuario, rol_id, activo } = req.body;
+    const plain = req.body.clave ?? req.body.clave_hash;
+
+    if (!id || !empleado_id || !usuario || !rol_id) {
+      return res.status(400).json({ error: "id, empleado_id, usuario y rol_id son requeridos" });
     }
-    res.json({ message: "Usuario actualizado correctamente" });
-  } catch (error) {
-    console.error("Error al actualizar usuario:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+
+    let hashedToSave = null;
+    if (plain && String(plain).trim() !== "") {
+      hashedToSave = await bcrypt.hash(String(plain), 10);
+    } else {
+      
+      const actual = await Usuario.obtenerUsuarioPorId(id);
+      if (!actual) return res.status(404).json({ error: "No encontrado" });
+      hashedToSave = actual.clave_hash;
+    }
+
+    const upd = await Usuario.actualizarUsuario(id, {
+      empleado_id: Number(empleado_id),
+      usuario: String(usuario).trim(),
+      clave_hash: hashedToSave,
+      rol_id: Number(rol_id),
+      activo: activo ? 1 : 0,
+    });
+
+    if (upd) delete upd.clave_hash;
+    res.json(upd);
+  } catch (e) {
+    console.error("Error actualizar usuario:", e);
+    if (e?.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({ error: "Usuario duplicado" });
+    }
+    res.status(500).json({ error: e?.sqlMessage || "Error interno" });
   }
 }
 
 async function eliminar(req, res) {
   try {
-    const { id } = req.params;
-    const eliminado = await usuarioModel.eliminarUsuario(id);
-    if (!eliminado) {
-      return res.status(404).json({ error: "Usuario no encontrado" });
-    }
-    res.json({ message: "Usuario eliminado correctamente" });
-  } catch (error) {
-    console.error("Error al eliminar usuario:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    await Usuario.BorrarUsuario(req.params.id);
+    res.json({ ok: true });
+  } catch (e) {
+    console.error("Error eliminar usuario:", e);
+    res.status(500).json({ error: e?.sqlMessage || "Error interno" });
   }
 }
 
-module.exports = {
-  listar,
-  crear,
-  obtener,
-  actualizar,
-  eliminar
-};
+module.exports = { listar, obtener, crear, actualizar, eliminar };

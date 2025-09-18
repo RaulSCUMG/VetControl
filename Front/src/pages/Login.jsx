@@ -15,7 +15,7 @@ export default function Login() {
     e.preventDefault();
     setErr("");
     setLoading(true);
-    const res = login(form.user.trim(), form.pass.trim());
+    const res = await login(form.user.trim(), form.pass.trim());
     setLoading(false);
     if (!res.ok) return setErr(res.msg || "Credenciales inválidas.");
     nav(redirectTo, { replace: true });

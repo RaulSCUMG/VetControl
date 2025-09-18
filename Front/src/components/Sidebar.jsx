@@ -11,7 +11,7 @@ export default function Sidebar() {
 
       <nav className="nav">
         <NavLink className="nav-item" to="/">
-          <FaTachometerAlt /> Dashboard
+          <FaTachometerAlt /> Inicio
         </NavLink>
         <NavLink className="nav-item" to="/pacientes">
           <FaUsers /> Pacientes
@@ -22,9 +22,9 @@ export default function Sidebar() {
         <NavLink className="nav-item" to="/inventario">
           <FaBoxes /> Inventario
         </NavLink>
-        <NavLink className="nav-item" to="/facturacion">
+        {/* <NavLink className="nav-item" to="/facturacion">
           <FaFileInvoice /> Facturación
-        </NavLink>
+        </NavLink> */}
         <NavLink className="nav-item" to="/empleados">
           <FaUserMd /> Empleados
         </NavLink>
@@ -37,9 +37,9 @@ export default function Sidebar() {
         <NavLink className="nav-item" to="/pantallas">
           <FaUserShield /> Pantallas
         </NavLink>
-        <NavLink className="nav-item" to="/reportes">
+        {/* <NavLink className="nav-item" to="/reportes">
           <FaChartLine /> Reportes
-        </NavLink>
+        </NavLink> */}
       </nav>
     </div>
   );

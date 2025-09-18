@@ -1,22 +1,42 @@
-const KEY = "vc_auth";
+import api from './api';
 
-export function login(username, password) {
-  // Demo: acepta cualquier user/pass no vacíos. Cambia esto por tu API.
-  if (!username || !password) return { ok: false, msg: "Ingresa usuario y contraseña." };
-  const user = { username, ts: Date.now() };
-  localStorage.setItem(KEY, JSON.stringify(user));
-  return { ok: true, user };
+const TOKEN_KEY = 'vc_token';
+const USER_KEY = 'vc_user';
+
+export async function login(usuario, clave) {
+  try {
+    const { data } = await api.post('/api/auth/login', { usuario, clave });
+    // Se espera { token, user }
+    localStorage.setItem(TOKEN_KEY, data.token);
+    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    return { ok: true };
+  } catch (e) {
+    const msg = e?.response?.data?.error || 'Credenciales inválidas.';
+    return { ok: false, msg };
+  }
 }
 
 export function logout() {
-  localStorage.removeItem(KEY);
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
 }
 
 export function getUser() {
-  const raw = localStorage.getItem(KEY);
-  try { return raw ? JSON.parse(raw) : null; } catch { return null; }
+  const raw = localStorage.getItem(USER_KEY);
+  return raw ? JSON.parse(raw) : null;
 }
 
-export function isAuthed() {
-  return !!getUser();
+export async function me() {
+  try {
+    const { data } = await api.get('/api/auth/me');
+    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    return { ok: true, user: data.user };
+  } catch {
+    logout();
+    return { ok: false };
+  }
+}
+
+export function isAuthenticated() {
+  return !!localStorage.getItem(TOKEN_KEY);
 }

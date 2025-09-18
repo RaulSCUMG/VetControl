@@ -64,7 +64,7 @@ export default function Usuarios() {
     const payload = {
       empleado_id: Number(form.empleado_id),
       usuario: form.usuario.trim(),
-      clave_hash: form.clave,
+      clave: form.clave,
       rol_id: Number(form.rol_id),
       activo: form.activo ? 1 : 0,
     };
@@ -96,7 +96,7 @@ export default function Usuarios() {
     const payload = {
       empleado_id: u.empleado_id,
       usuario: u.usuario,
-      clave_hash: u.clave_hash,
+      // clave_hash: u.clave_hash,
       rol_id: Number(draft.rol_id),
       activo: draft.activo ? 1 : 0,
     };
@@ -126,7 +126,8 @@ export default function Usuarios() {
     const payload = {
       empleado_id: u.empleado_id,
       usuario: u.usuario,
-      clave_hash: pw.a,
+      // clave_hash: pw.a,
+      clave: pw.a,
       rol_id: u.rol_id,
       activo: u.activo ? 1 : 0,
     };
