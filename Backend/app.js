@@ -27,6 +27,7 @@ const rolesPantallas = require("./src/routes/rolesPantallasRoutes");
 const productos = require("./src/routes/productosRoutes");
 const movimientos = require("./src/routes/movimientosInventarioRoutes");
 const auth = require("./src/routes/authRoutes");
+const reportes = require("./src/routes/reportesRoutes");
 
 app.use("/api/categorias", categoriasRoutes);
 app.use("/api/especialidades", especialidadesRoutes);
@@ -43,5 +44,6 @@ app.use("/api/rolesPantallas", rolesPantallas);
 app.use("/api/productos", productos);
 app.use("/api/movimientos", movimientos);
 app.use("/api/auth", auth);
+app.use("/api/reportes", reportes);
 
 module.exports = app;
