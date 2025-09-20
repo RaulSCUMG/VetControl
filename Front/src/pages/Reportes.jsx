@@ -3,7 +3,7 @@ import StatCard from "../components/StatCard";
 import api from "../lib/api";
 
 
-// === CSV helpers NUEVOS ===
+
 const toCSV = (rows) => {
     if (!rows?.length) return "";
     const headers = Object.keys(rows[0]);
@@ -13,7 +13,7 @@ const toCSV = (rows) => {
 };
 
 const download = (filename, csvText) => {
-    // BOM para Excel
+
     const blob = new Blob(["\uFEFF", csvText], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -93,7 +93,6 @@ function Filters({ startDate, endDate, setStartDate, setEndDate, search, setSear
 function Table({ rows }) {
     if (!rows?.length) return <div className="muted">Sin datos en el rango/criterio.</div>;
 
-    // Detecta columnas y cuáles son numéricas
     const first = rows[0];
     const columns = Object.keys(first).map(k => ({
         key: k,
@@ -107,7 +106,7 @@ function Table({ rows }) {
         ingresoTotal: "Ingreso total",
         tickets: "Tickets",
         ticketsProm: "Ticket prom.",
-        nuevosClientes: "Nuevos clientes",
+        nuevosClientes: "Clientes",
     };
     const prettify = (k) =>
         HEADER[k] ||
@@ -118,7 +117,6 @@ function Table({ rows }) {
     return (
         <div className="table-card">
             <table className="table table-hover table-zebra">
-                {/* fija anchos para que header y body coincidan */}
                 <colgroup>
                     <col style={{ width: "22%" }} />
                     <col style={{ width: "26%" }} />
@@ -153,7 +151,6 @@ function Table({ rows }) {
                 </tbody>
             </table>
 
-            {/* estilos mínimos para coherencia */}
             <style>{`
         .table-card table { width: 100%; table-layout: fixed; border-collapse: separate; }
         .table-card th, .table-card td { padding: 10px 12px; vertical-align: middle; }
@@ -197,7 +194,6 @@ function VentasTable({ rows }) {
                 </tbody>
             </table>
 
-            {/* estilos scoped */}
             <style>{`
         .ventas-table table{
             width:100%;
@@ -349,18 +345,22 @@ function ClinicalReport({ startDate, endDate, search, pacientes, inventario }) {
 function StrategyReport({ startDate, endDate, search, crecimiento }) {
     const base = useMemo(() => {
         return (crecimiento || []).map((v) => ({
-            periodo: (v.periodo || (v.fecha || "").slice(0, 7)),   // YYYY-MM
+            periodo: (v.periodo || (v.fecha || "").slice(0, 7)),
             responsable: v.responsable || "",
             ingreso: Number(v.ingresoTotal ?? v["ingreso total"] ?? v.total ?? 0),
         }));
     }, [crecimiento]);
 
     const filtered = useMemo(() => {
-        return base.filter((v) => {
-            const p = v.periodo + "-01";
-            return (!startDate || p >= startDate) && (!endDate || p <= endDate);
-        });
+        const toYM = (d) => (d ? d.slice(0, 7) : "");
+        const minYM = toYM(startDate);
+        const maxYM = toYM(endDate);
+        return base.filter(v =>
+            (!startDate || v.periodo >= minYM) &&
+            (!endDate || v.periodo <= maxYM)
+        );
     }, [base, startDate, endDate]);
+
 
     const firstSeen = useMemo(() => {
         const m = new Map();
@@ -424,9 +424,7 @@ export default function Reportes() {
     const [inventario, setInventario] = useState([]);
     const [crecimiento, setCrecimiento] = useState([]);
 
-    //// Dentro de export default function Reportes() { ...aquí van tus useState... }
 
-    // Fecha dentro de rango usando estado actual
     const inRange = useCallback(
         (d) => (!startDate || d >= startDate) && (!endDate || d <= endDate),
         [startDate, endDate]
@@ -471,12 +469,19 @@ export default function Reportes() {
 
         if (tab === "Reportes Estratégicos") {
             const base = (crecimiento || []).map(v => ({
-                periodo: v.periodo || (v.fecha || "").slice(0, 7), // YYYY-MM
+                periodo: v.periodo || (v.fecha || "").slice(0, 7),
                 responsable: v.responsable || "",
                 ingreso: Number(v.ingresoTotal ?? v["ingreso total"] ?? v.total ?? 0),
             }));
 
-            const filtered = base.filter(v => inRange(v.periodo + "-01"));
+            const toYM = (d) => (d ? d.slice(0, 7) : "");
+            const minYM = toYM(startDate);
+            const maxYM = toYM(endDate);
+
+            const filtered = base.filter(v =>
+                (!startDate || v.periodo >= minYM) &&
+                (!endDate || v.periodo <= maxYM)
+            );
 
             const firstSeen = new Map();
             base.forEach(v => {
@@ -502,9 +507,7 @@ export default function Reportes() {
         download(`reporte_${tab.toLowerCase().replace(/\s+/g, "_")}.csv`, toCSV(rows));
     }, [tab, ventas, pacientes, crecimiento, startDate, endDate, search, inRange]);
 
-// aca termina otra vez
 
-    //se añadio mapeo
     const mapVenta = (r) => ({
         fecha: r.fecha,
         cliente: r.responsable ?? "",
@@ -533,7 +536,7 @@ export default function Reportes() {
         ingresoTotal: Number(r["ingreso total"] ?? 0),
     });
 
-    //aca termina
+
 
     useEffect(() => {
         (async () => {
