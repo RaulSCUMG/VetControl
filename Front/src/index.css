@@ -594,7 +594,7 @@ body{
 /* Footer de acciones fijo visualmente */
 .form-footer{
 body.login-bg {
-  background-image: url('/LOGIN MORADO.jpg');
+  background-image: url('/LOGIN MORADO.png');
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -632,7 +632,7 @@ body.dark-mode.login-bg .login-card .form-container {
    background visible (override broader dark-mode body rules). */
 body.dark-mode.login-bg,
 body.login-bg.dark-mode {
-  background-image: url('/LOGIN MORADO.jpg') !important;
+  background-image: url('/LOGIN MORADO.png') !important;
   background-position: center center !important;
   background-size: cover !important;
   background-repeat: no-repeat !important;
@@ -869,27 +869,20 @@ label input:focus{ border-color:#b8bdfa; box-shadow:0 0 0 3px rgba(92,108,255,.1
 .login-wrap{
   min-height: 100vh;
   display: grid;
-  align-items: center; /* vertical center */
-  justify-items: start; /* place content to the left so the dog image is visible on the right */
-  /* usar la imagen que pegaste en public con el nombre exacto 'LOGIN MORADO.jpg' */
-  /* Left-side soft color band so the blank area matches the image tones and the
-    animals remain visually steady on the right. The gradient is above the image
-    layer so the left side shows a soft blur-like color matching the photo. */
-  /* Use the photographic image as the only background and make it cover the
-    entire viewport so there are no blank bands. */
-  /* make the login wrapper cover the full viewport so the image fills all the
-     green-lined areas in your reference screenshots */
+  align-items: center;
+  justify-items: start;
   position: fixed;
   inset: 0;
   width: 100vw;
   height: 100vh;
   z-index: 0;
-  background-image: url('/LOGIN MORADO.jpg');
-  background-position: center center;
+  background-image: url('/LOGIN MORADO.png');
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
   padding: 1rem;
+
+  background-position: 85% calc(100% + 20px); /*center center; */
 }
 
 /* overlay to keep card readable over image */
