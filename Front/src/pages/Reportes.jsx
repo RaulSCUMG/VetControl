@@ -2,19 +2,23 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import StatCard from "../components/StatCard";
 import api from "../lib/api";
 
-
-
 const toCSV = (rows) => {
     if (!rows?.length) return "";
     const headers = Object.keys(rows[0]);
-    const esc = (v) => `"${String(v ?? "").replaceAll('"', '""').replaceAll('\n', ' ')}"`;
-    const body = rows.map(r => headers.map(h => esc(r[h])).join(",")).join("\n");
+    const esc = (v) =>
+        `"${String(v ?? "")
+            .replaceAll('"', '""')
+            .replaceAll("\n", " ")}"`;
+    const body = rows
+        .map((r) => headers.map((h) => esc(r[h])).join(","))
+        .join("\n");
     return headers.join(",") + "\n" + body;
 };
 
 const download = (filename, csvText) => {
-
-    const blob = new Blob(["\uFEFF", csvText], { type: "text/csv;charset=utf-8" });
+    const blob = new Blob(["\uFEFF", csvText], {
+        type: "text/csv;charset=utf-8",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -25,25 +29,40 @@ const download = (filename, csvText) => {
     URL.revokeObjectURL(url);
 };
 
-
-
-
 const formatQ = (n) =>
-    new Intl.NumberFormat("es-GT", { style: "currency", currency: "GTQ", minimumFractionDigits: 2 }).format(n || 0);
+    new Intl.NumberFormat("es-GT", {
+        style: "currency",
+        currency: "GTQ",
+        minimumFractionDigits: 2,
+    }).format(n || 0);
 
-const parseISO = (s) => (s ? new Date(s + (s.length === 10 ? "T00:00:00" : "")) : null);
+const parseISO = (s) =>
+    s ? new Date(s + (s.length === 10 ? "T00:00:00" : "")) : null;
 
 // ---------------- Microcomponentes UI ----------------
 const Badge = ({ children }) => (
-    <span className="badge" style={{ marginLeft: 8 }}>{children}</span>
+    <span className="badge" style={{ marginLeft: 8 }}>
+        {children}
+    </span>
 );
 
 const Sparkbar = ({ data = [], max, height = 28 }) => {
     const m = max ?? Math.max(1, ...data);
     return (
-        <div className="sparkbar" style={{ display: "flex", gap: 3, alignItems: "flex-end", height }}>
+        <div
+            className="sparkbar"
+            style={{ display: "flex", gap: 3, alignItems: "flex-end", height }}
+        >
             {data.map((v, i) => (
-                <div key={i} style={{ width: 6, height: Math.max(2, (v / m) * height), borderRadius: 3 }} className="sparkbar-bar" />
+                <div
+                    key={i}
+                    style={{
+                        width: 6,
+                        height: Math.max(2, (v / m) * height),
+                        borderRadius: 3,
+                    }}
+                    className="sparkbar-bar"
+                />
             ))}
         </div>
     );
@@ -53,37 +72,75 @@ const BarRow = ({ label, value, max }) => (
     <div className="barrow">
         <div className="barrow-label">{label}</div>
         <div className="barrow-track">
-            <div className="barrow-fill" style={{ width: `${max ? (value / max) * 100 : 0}%` }} />
+            <div
+                className="barrow-fill"
+                style={{ width: `${max ? (value / max) * 100 : 0}%` }}
+            />
         </div>
         <div className="barrow-value">{value}</div>
     </div>
 );
 
-function Filters({ startDate, endDate, setStartDate, setEndDate, search, setSearch, onExport, onQuick }) {
+function Filters({
+    startDate,
+    endDate,
+    setStartDate,
+    setEndDate,
+    search,
+    setSearch,
+    onExport,
+    onQuick,
+}) {
     return (
         <div className="card sticky-filters">
             <div className="filters-grid">
                 <label>
                     <div className="label">Desde</div>
-                    <input className="date-input" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                    <input
+                        className="date-input"
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                    />
                 </label>
                 <label>
                     <div className="label">Hasta</div>
-                    <input className="date-input" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                    <input
+                        className="date-input"
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                    />
                 </label>
                 <label className="col-2">
                     <div className="label">Buscar</div>
-                    <input className="field" type="text" placeholder="Cliente, servicio, mascota…" value={search} onChange={(e) => setSearch(e.target.value)} />
+                    <input
+                        className="field"
+                        type="text"
+                        placeholder="Cliente, servicio, mascota…"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
                 </label>
                 <div className="actions">
                     <div className="quick">
-                        <button className="chip" onClick={() => onQuick("today")}>Hoy</button>
-                        <button className="chip" onClick={() => onQuick("7d")}>7d</button>
-                        <button className="chip" onClick={() => onQuick("30d")}>30d</button>
-                        <button className="chip" onClick={() => onQuick("all")}>Todo</button>
+                        <button className="chip" onClick={() => onQuick("today")}>
+                            Hoy
+                        </button>
+                        <button className="chip" onClick={() => onQuick("7d")}>
+                            7d
+                        </button>
+                        <button className="chip" onClick={() => onQuick("30d")}>
+                            30d
+                        </button>
+                        <button className="chip" onClick={() => onQuick("all")}>
+                            Todo
+                        </button>
                     </div>
                     <div className="spacer" />
-                    <button className="btn" onClick={onExport}>Exportar CSV</button>
+                    <button className="btn" onClick={onExport}>
+                        Exportar CSV
+                    </button>
                 </div>
             </div>
         </div>
@@ -91,10 +148,11 @@ function Filters({ startDate, endDate, setStartDate, setEndDate, search, setSear
 }
 
 function Table({ rows }) {
-    if (!rows?.length) return <div className="muted">Sin datos en el rango/criterio.</div>;
+    if (!rows?.length)
+        return <div className="muted">Sin datos en el rango/criterio.</div>;
 
     const first = rows[0];
-    const columns = Object.keys(first).map(k => ({
+    const columns = Object.keys(first).map((k) => ({
         key: k,
         isNum:
             typeof first[k] === "number" ||
@@ -110,7 +168,8 @@ function Table({ rows }) {
     };
     const prettify = (k) =>
         HEADER[k] ||
-        k.replace(/_/g, " ")
+        k
+            .replace(/_/g, " ")
             .replace(/([a-z])([A-Z])/g, "$1 $2")
             .replace(/\b\w/g, (c) => c.toUpperCase());
 
@@ -126,7 +185,7 @@ function Table({ rows }) {
 
                 <thead className="sticky">
                     <tr>
-                        {columns.map(c => (
+                        {columns.map((c) => (
                             <th key={c.key} style={{ textAlign: c.isNum ? "right" : "left" }}>
                                 {prettify(c.key)}
                             </th>
@@ -137,12 +196,19 @@ function Table({ rows }) {
                 <tbody>
                     {rows.map((r, i) => (
                         <tr key={i}>
-                            {columns.map(c => {
+                            {columns.map((c) => {
                                 const v = r[c.key];
                                 const isMoney = c.key.toLowerCase().includes("ingreso");
-                                return (
-                                    <td key={c.key} style={{ textAlign: c.isNum ? "right" : "left" }}>
-                                        {isMoney ? formatQ(Number(v) || 0) : String(v)}
+                                return ( 
+                                    <td                                                                 
+                                        key={c.key}
+                                        style={{ textAlign: c.isNum ? "right" : "left" }}
+                                    >
+                                        {c.key.toLowerCase().includes("ingreso")
+                                            ? formatQ(Number(v) || 0)
+                                            : c.key.toLowerCase().includes("prom")
+                                                ? formatQ(Number(v.toFixed(2)) || 0)
+                                                : String(v)}
                                     </td>
                                 );
                             })}
@@ -159,9 +225,9 @@ function Table({ rows }) {
     );
 }
 
-
 function VentasTable({ rows }) {
-    if (!rows?.length) return <div className="muted">Sin ventas en el rango.</div>;
+    if (!rows?.length)
+        return <div className="muted">Sin ventas en el rango.</div>;
 
     return (
         <div className="ventas-table">
@@ -223,15 +289,16 @@ function VentasTable({ rows }) {
     );
 }
 
-
-
 // ---------------- Secciones ----------------
 function AdminReport({ startDate, endDate, search, ventas }) {
     const filtered = useMemo(() => {
         return ventas.filter((v) => {
-            const okDate = (!startDate || v.fecha >= startDate) && (!endDate || v.fecha <= endDate);
+            const okDate =
+                (!startDate || v.fecha >= startDate) &&
+                (!endDate || v.fecha <= endDate);
             const q = (search || "").toLowerCase();
-            const okText = !q || [v.cliente, v.servicio].some((x) => x.toLowerCase().includes(q));
+            const okText =
+                !q || [v.cliente, v.servicio].some((x) => x.toLowerCase().includes(q));
             return okDate && okText;
         });
     }, [startDate, endDate, search, ventas]);
@@ -242,14 +309,23 @@ function AdminReport({ startDate, endDate, search, ventas }) {
 
     const byFechaSeries = useMemo(() => {
         const map = new Map();
-        filtered.forEach((v) => map.set(v.fecha, (map.get(v.fecha) || 0) + v.total));
-        return Array.from(map.entries()).sort(([a], [b]) => (a > b ? 1 : -1)).map(([, v]) => v);
+        filtered.forEach((v) =>
+            map.set(v.fecha, (map.get(v.fecha) || 0) + v.total)
+        );
+        return Array.from(map.entries())
+            .sort(([a], [b]) => (a > b ? 1 : -1))
+            .map(([, v]) => v);
     }, [filtered]);
 
     const byServicio = useMemo(() => {
         const map = new Map();
-        filtered.forEach((v) => map.set(v.servicio, (map.get(v.servicio) || 0) + 1));
-        const arr = Array.from(map.entries()).map(([k, v]) => ({ servicio: k, conteo: v }));
+        filtered.forEach((v) =>
+            map.set(v.servicio, (map.get(v.servicio) || 0) + 1)
+        );
+        const arr = Array.from(map.entries()).map(([k, v]) => ({
+            servicio: k,
+            conteo: v,
+        }));
         arr.sort((a, b) => b.conteo - a.conteo);
         return arr.slice(0, 4);
     }, [filtered]);
@@ -267,7 +343,10 @@ function AdminReport({ startDate, endDate, search, ventas }) {
                 </div>
                 <StatCard title="Tickets" value={tickets} />
                 <StatCard title="Ticket prom." value={formatQ(prom)} />
-                <StatCard title="Servicios" value={[...new Set(filtered.map((x) => x.servicio))].length} />
+                <StatCard
+                    title="Servicios"
+                    value={[...new Set(filtered.map((x) => x.servicio))].length}
+                />
             </section>
 
             <div className="grid-2">
@@ -281,7 +360,12 @@ function AdminReport({ startDate, endDate, search, ventas }) {
                     {byServicio.length ? (
                         <div className="barrow-list">
                             {byServicio.map((x) => (
-                                <BarRow key={x.servicio} label={x.servicio} value={x.conteo} max={maxSvc} />
+                                <BarRow
+                                    key={x.servicio}
+                                    label={x.servicio}
+                                    value={x.conteo}
+                                    max={maxSvc}
+                                />
                             ))}
                         </div>
                     ) : (
@@ -296,13 +380,18 @@ function AdminReport({ startDate, endDate, search, ventas }) {
 function ClinicalReport({ startDate, endDate, search, pacientes, inventario }) {
     const filtered = useMemo(() => {
         return pacientes.filter((v) => {
-            const okDate = (!startDate || v.fecha >= startDate) && (!endDate || v.fecha <= endDate);
+            const okDate =
+                (!startDate || v.fecha >= startDate) &&
+                (!endDate || v.fecha <= endDate);
             const q = (search || "").toLowerCase();
-            const okText = !q || [v.mascota, v.especie, v.accion].some((x) => x.toLowerCase().includes(q));
+            const okText =
+                !q ||
+                [v.mascota, v.especie, v.accion].some((x) =>
+                    x.toLowerCase().includes(q)
+                );
             return okDate && okText;
         });
     }, [startDate, endDate, search, pacientes]);
-
 
     const inventarioBajo = inventario.filter((i) => i.stock <= i.minimo);
     const maxStock = Math.max(1, ...inventarioBajo.map((i) => i.minimo));
@@ -311,7 +400,10 @@ function ClinicalReport({ startDate, endDate, search, pacientes, inventario }) {
         <>
             <section className="stats-grid">
                 <StatCard title="Eventos clínicos" value={filtered.length} />
-                <StatCard title="Mascotas únicas" value={[...new Set(filtered.map((x) => x.mascota))].length} />
+                <StatCard
+                    title="Mascotas únicas"
+                    value={[...new Set(filtered.map((x) => x.mascota))].length}
+                />
                 <StatCard title="Inventario bajo" value={inventarioBajo.length} />
             </section>
 
@@ -325,7 +417,12 @@ function ClinicalReport({ startDate, endDate, search, pacientes, inventario }) {
                     {inventarioBajo.length ? (
                         <div className="barrow-list">
                             {inventarioBajo.map((i) => (
-                                <BarRow key={i.sku} label={`${i.producto} (${i.stock}/${i.minimo})`} value={i.minimo - i.stock} max={maxStock} />
+                                <BarRow
+                                    key={i.sku}
+                                    label={`${i.producto} (${i.stock}/${i.minimo})`}
+                                    value={i.minimo - i.stock}
+                                    max={maxStock}
+                                />
                             ))}
                         </div>
                     ) : (
@@ -345,7 +442,7 @@ function ClinicalReport({ startDate, endDate, search, pacientes, inventario }) {
 function StrategyReport({ startDate, endDate, search, crecimiento }) {
     const base = useMemo(() => {
         return (crecimiento || []).map((v) => ({
-            periodo: (v.periodo || (v.fecha || "").slice(0, 7)),
+            periodo: v.periodo || (v.fecha || "").slice(0, 7),
             responsable: v.responsable || "",
             ingreso: Number(v.ingresoTotal ?? v["ingreso total"] ?? v.total ?? 0),
         }));
@@ -355,36 +452,50 @@ function StrategyReport({ startDate, endDate, search, crecimiento }) {
         const toYM = (d) => (d ? d.slice(0, 7) : "");
         const minYM = toYM(startDate);
         const maxYM = toYM(endDate);
-        return base.filter(v =>
-            (!startDate || v.periodo >= minYM) &&
-            (!endDate || v.periodo <= maxYM)
+        return base.filter(
+            (v) =>
+                (!startDate || v.periodo >= minYM) && (!endDate || v.periodo <= maxYM)
         );
     }, [base, startDate, endDate]);
 
-
     const firstSeen = useMemo(() => {
         const m = new Map();
-        base.forEach(v => { if (!m.has(v.responsable) || v.periodo < m.get(v.responsable)) m.set(v.responsable, v.periodo); });
+        base.forEach((v) => {
+            if (!m.has(v.responsable) || v.periodo < m.get(v.responsable))
+                m.set(v.responsable, v.periodo);
+        });
         return m;
     }, [base]);
 
     const rows = useMemo(() => {
         const agg = new Map();
-        filtered.forEach(v => {
-            const cur = agg.get(v.periodo) || { periodo: v.periodo, ingresoTotal: 0, tickets: 0, nuevosClientes: 0 };
+        filtered.forEach((v) => {
+            const cur = agg.get(v.periodo) || {
+                periodo: v.periodo,
+                ingresoTotal: 0,
+                tickets: 0,
+                nuevosClientes: 0,
+            };
             cur.ingresoTotal += v.ingreso;
             cur.tickets += 1;
             if (firstSeen.get(v.responsable) === v.periodo) cur.nuevosClientes += 1;
             agg.set(v.periodo, cur);
         });
         return [...agg.values()]
-            .map(x => ({ ...x, ticketsProm: x.tickets ? x.ingresoTotal / x.tickets : 0 }))
+            .map((x) => ({
+                ...x,
+                ticketsProm: x.tickets ? x.ingresoTotal / x.tickets : 0,
+            }))
             .sort((a, b) => (a.periodo > b.periodo ? 1 : -1));
     }, [filtered, firstSeen]);
 
     const searched = useMemo(() => {
         const q = (search || "").toLowerCase();
-        return !q ? rows : rows.filter(r => Object.values(r).some(x => String(x).toLowerCase().includes(q)));
+        return !q
+            ? rows
+            : rows.filter((r) =>
+                Object.values(r).some((x) => String(x).toLowerCase().includes(q))
+            );
     }, [rows, search]);
 
     const ingresoTotal = searched.reduce((s, x) => s + x.ingresoTotal, 0);
@@ -402,14 +513,20 @@ function StrategyReport({ startDate, endDate, search, crecimiento }) {
             </section>
             <div className="card">
                 <h3>Crecimiento mensual</h3>
-                <Table rows={searched.map(({ periodo, ingresoTotal, ticketsProm, nuevosClientes }) => ({ periodo, ingresoTotal, ticketsProm, nuevosClientes }))} />
+                <Table
+                    rows={searched.map(
+                        ({ periodo, ingresoTotal, ticketsProm, nuevosClientes }) => ({
+                            periodo,
+                            ingresoTotal,
+                            ticketsProm,
+                            nuevosClientes,
+                        })
+                    )}
+                />
             </div>
         </>
     );
 }
-
-
-
 
 // ---------------- Página principal ----------------
 export default function Reportes() {
@@ -424,7 +541,6 @@ export default function Reportes() {
     const [inventario, setInventario] = useState([]);
     const [crecimiento, setCrecimiento] = useState([]);
 
-
     const inRange = useCallback(
         (d) => (!startDate || d >= startDate) && (!endDate || d <= endDate),
         [startDate, endDate]
@@ -434,41 +550,52 @@ export default function Reportes() {
         let rows = [];
 
         if (tab === "Reportes Administrativos") {
-            const filtered = ventas.filter(v => {
+            const filtered = ventas.filter((v) => {
                 const okDate = inRange(v.fecha);
                 const q = (search || "").toLowerCase();
-                const okText = !q || [v.cliente ?? v.responsable, v.servicio ?? v.descripcion]
-                    .some(x => String(x || "").toLowerCase().includes(q));
+                const okText =
+                    !q ||
+                    [v.cliente ?? v.responsable, v.servicio ?? v.descripcion].some((x) =>
+                        String(x || "")
+                            .toLowerCase()
+                            .includes(q)
+                    );
                 return okDate && okText;
             });
 
-            rows = filtered.map(v => ({
-                "Fecha": v.fecha,
-                "Cliente": v.cliente ?? v.responsable ?? "",
-                "Servicio": v.servicio ?? v.descripcion ?? "",
-                "Total": Number(v.total ?? 0).toFixed(2),
+            rows = filtered.map((v) => ({
+                Fecha: v.fecha,
+                Cliente: v.cliente ?? v.responsable ?? "",
+                Servicio: v.servicio ?? v.descripcion ?? "",
+                Total: Number(v.total ?? 0).toFixed(2),
             }));
         }
 
         if (tab === "Reportes Clínicos") {
-            const filtered = pacientes.filter(v => {
+            const filtered = pacientes.filter((v) => {
                 const okDate = inRange(v.fecha);
                 const q = (search || "").toLowerCase();
-                const okText = !q || [v.mascota ?? v.nombre, v.especie, v.accion ?? v.descripcion]
-                    .some(x => String(x || "").toLowerCase().includes(q));
+                const okText =
+                    !q ||
+                    [v.mascota ?? v.nombre, v.especie, v.accion ?? v.descripcion].some(
+                        (x) =>
+                            String(x || "")
+                                .toLowerCase()
+                                .includes(q)
+                    );
                 return okDate && okText;
             });
 
-            rows = filtered.map(v => ({
-                "Fecha": v.fecha,
-                "Mascota": v.mascota ?? v.nombre ?? "",
-                "Especie": v.especie ?? "",
-                "Acción": v.accion ?? v.descripcion ?? "",
+            rows = filtered.map((v) => ({
+                Fecha: v.fecha,
+                Mascota: v.mascota ?? v.nombre ?? "",
+                Especie: v.especie ?? "",
+                Acción: v.accion ?? v.descripcion ?? "",
             }));
         }
 
         if (tab === "Reportes Estratégicos") {
-            const base = (crecimiento || []).map(v => ({
+            const base = (crecimiento || []).map((v) => ({
                 periodo: v.periodo || (v.fecha || "").slice(0, 7),
                 responsable: v.responsable || "",
                 ingreso: Number(v.ingresoTotal ?? v["ingreso total"] ?? v.total ?? 0),
@@ -478,35 +605,57 @@ export default function Reportes() {
             const minYM = toYM(startDate);
             const maxYM = toYM(endDate);
 
-            const filtered = base.filter(v =>
-                (!startDate || v.periodo >= minYM) &&
-                (!endDate || v.periodo <= maxYM)
+            const filtered = base.filter(
+                (v) =>
+                    (!startDate || v.periodo >= minYM) && (!endDate || v.periodo <= maxYM)
             );
 
             const firstSeen = new Map();
-            base.forEach(v => {
+            base.forEach((v) => {
                 const prev = firstSeen.get(v.responsable);
                 if (!prev || v.periodo < prev) firstSeen.set(v.responsable, v.periodo);
             });
 
             const agg = new Map();
-            filtered.forEach(v => {
-                const cur = agg.get(v.periodo) || { "Periodo": v.periodo, "Ingreso total": 0, "Tickets": 0, "Nuevos clientes": 0 };
+            filtered.forEach((v) => {
+                const cur = agg.get(v.periodo) || {
+                    Periodo: v.periodo,
+                    "Ingreso total": 0,
+                    Tickets: 0,
+                    "Nuevos clientes": 0,
+                };
                 cur["Ingreso total"] += v.ingreso;
                 cur["Tickets"] += 1;
-                if (firstSeen.get(v.responsable) === v.periodo) cur["Nuevos clientes"] += 1;
+                if (firstSeen.get(v.responsable) === v.periodo)
+                    cur["Nuevos clientes"] += 1;
                 agg.set(v.periodo, cur);
             });
 
             rows = Array.from(agg.values())
-                .map(x => ({ ...x, "Ticket prom.": x.Tickets ? (x["Ingreso total"] / x.Tickets).toFixed(2) : "0.00" }))
+                .map((x) => ({
+                    ...x,
+                    "Ticket prom.": x.Tickets
+                        ? (x["Ingreso total"] / x.Tickets).toFixed(2)
+                        : "0.00",
+                }))
                 .sort((a, b) => (a["Periodo"] > b["Periodo"] ? 1 : -1));
         }
 
         if (!rows.length) return;
-        download(`reporte_${tab.toLowerCase().replace(/\s+/g, "_")}.csv`, toCSV(rows));
-    }, [tab, ventas, pacientes, crecimiento, startDate, endDate, search, inRange]);
-
+        download(
+            `reporte_${tab.toLowerCase().replace(/\s+/g, "_")}.csv`,
+            toCSV(rows)
+        );
+    }, [
+        tab,
+        ventas,
+        pacientes,
+        crecimiento,
+        startDate,
+        endDate,
+        search,
+        inRange,
+    ]);
 
     const mapVenta = (r) => ({
         fecha: r.fecha,
@@ -519,7 +668,7 @@ export default function Reportes() {
         fecha: r.fecha ?? "",
         mascota: r.nombre ?? "",
         especie: r.especie ?? "",
-        accion: r.descripcion ?? ""
+        accion: r.descripcion ?? "",
     });
 
     const mapInventario = (r) => ({
@@ -536,23 +685,18 @@ export default function Reportes() {
         ingresoTotal: Number(r["ingreso total"] ?? 0),
     });
 
-
-
     useEffect(() => {
         (async () => {
             try {
                 setLoading(true);
                 setErr("");
-                const [getVentas, getPacientes, getInventario, getCrecimiento] = await Promise.all([
-                    api.get("/api/reportes/datosVentas"),
-                    api.get("/api/reportes/datosPacientesAcciones"),
-                    api.get("/api/reportes/datosInventario"),
-                    api.get("/api/reportes/datosCrecimiento"),
-                ]);
-                // setVentas((getVentas.data || []));
-                // setPacientes((getPacientes.data || []));
-                // setInventario((getInventario.data || []));
-                // setCrecimiento((getCrecimiento.data || []));
+                const [getVentas, getPacientes, getInventario, getCrecimiento] =
+                    await Promise.all([
+                        api.get("/api/reportes/datosVentas"),
+                        api.get("/api/reportes/datosPacientesAcciones"),
+                        api.get("/api/reportes/datosInventario"),
+                        api.get("/api/reportes/datosCrecimiento"),
+                    ]);
                 setVentas((getVentas.data || []).map(mapVenta));
                 setPacientes((getPacientes.data || []).map(mapPaciente));
                 setInventario((getInventario.data || []).map(mapInventario));
@@ -563,27 +707,30 @@ export default function Reportes() {
                 setLoading(false);
             }
         })();
-    }, [])
-
+    }, []);
 
     const applyQuick = (kind) => {
         const today = new Date();
         if (kind === "today") {
             const y = today.toISOString().slice(0, 10);
-            setStartDate(y); setEndDate(y);
+            setStartDate(y);
+            setEndDate(y);
         }
         if (kind === "7d") {
-            const d = new Date(today); d.setDate(d.getDate() - 6);
+            const d = new Date(today);
+            d.setDate(d.getDate() - 6);
             setStartDate(d.toISOString().slice(0, 10));
             setEndDate(today.toISOString().slice(0, 10));
         }
         if (kind === "30d") {
-            const d = new Date(today); d.setDate(d.getDate() - 29);
+            const d = new Date(today);
+            d.setDate(d.getDate() - 29);
             setStartDate(d.toISOString().slice(0, 10));
             setEndDate(today.toISOString().slice(0, 10));
         }
         if (kind === "all") {
-            setStartDate(""); setEndDate("");
+            setStartDate("");
+            setEndDate("");
         }
     };
 
@@ -595,7 +742,10 @@ export default function Reportes() {
         <div className="dashboard">
             <section className="stats-grid" style={{ marginBottom: 0 }}>
                 <StatCard title="Módulo" value={tab} />
-                <StatCard title="Rango" value={`${startDate || '—'} → ${endDate || '—'}`} />
+                <StatCard
+                    title="Rango"
+                    value={`${startDate || "—"} → ${endDate || "—"}`}
+                />
                 <StatCard title="Filtro" value={search || "(sin filtro)"} />
             </section>
 
@@ -608,8 +758,8 @@ export default function Reportes() {
                     ].map(({ k, n }) => (
                         <button
                             key={k}
-                            className={`pill ${k === tab ? 'active' : ''}`}
-                            aria-current={k === tab ? 'page' : undefined}
+                            className={`pill ${k === tab ? "active" : ""}`}
+                            aria-current={k === tab ? "page" : undefined}
                             onClick={() => setTab(k)}
                         >
                             {k}
@@ -630,13 +780,29 @@ export default function Reportes() {
             />
 
             {tab === "Reportes Administrativos" && (
-                <AdminReport startDate={startDate} endDate={endDate} search={search} ventas={ventas} />
+                <AdminReport
+                    startDate={startDate}
+                    endDate={endDate}
+                    search={search}
+                    ventas={ventas}
+                />
             )}
             {tab === "Reportes Clínicos" && (
-                <ClinicalReport startDate={startDate} endDate={endDate} search={search} pacientes={pacientes} inventario={inventario} />
+                <ClinicalReport
+                    startDate={startDate}
+                    endDate={endDate}
+                    search={search}
+                    pacientes={pacientes}
+                    inventario={inventario}
+                />
             )}
             {tab === "Reportes Estratégicos" && (
-                <StrategyReport startDate={startDate} endDate={endDate} search={search} crecimiento={crecimiento} />
+                <StrategyReport
+                    startDate={startDate}
+                    endDate={endDate}
+                    search={search}
+                    crecimiento={crecimiento}
+                />
             )}
 
             <style>{`

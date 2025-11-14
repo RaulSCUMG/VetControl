@@ -1,0 +1,22 @@
+services:
+  node20:
+    image: node:20.12.1-alpine3.19
+    container_name: node20
+    profiles: ["v20"]
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - "3000:3000"
+    command: sh -lc "npm ci || npm install && npm run dev"
+
+  node22:
+    image: node:22.19.0
+    container_name: node22
+    profiles: ["v22"]
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - "3000:3000"
+    command: bash -lc "npm ci || npm install && npm run dev"
